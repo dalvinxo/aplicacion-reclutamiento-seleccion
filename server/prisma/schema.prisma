@@ -9,3 +9,144 @@ datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
+
+model Competencia {
+  id_competencia Int       @id @default(autoincrement())
+  descripcion    String
+  estado         Boolean    @default(true)
+  PuestoCompetencia PuestoCompetencia[]
+  CandidatoCompetencia CandidatoCompetencia[]
+}
+
+model Idioma {
+  id_idioma Int    @id @default(autoincrement())
+  nombre    String
+  estado    Boolean   @default(true)
+  PuestoIdioma PuestoIdioma[]
+}
+
+model Capacitacion {
+  id_capacitacion Int       @id @default(autoincrement())
+  candidato_id    Int
+  descripcion     String
+  nivel           String
+  fecha_desde     DateTime
+  fecha_hasta     DateTime
+  institucion     String
+  Candidato       Candidato @relation(fields: [candidato_id], references: [id_candidato])
+}
+
+model Puesto {
+  id_puesto           Int                 @id @default(autoincrement())
+  nombre              String              @unique
+  nivel_riesgo        String              
+  nivel_minimo_salario Float              @default(0.0)
+  nivel_maximo_salario Float              @default(0.0)
+  estado              Boolean             @default(true)
+  PuestoCompetencia   PuestoCompetencia[]
+  PuestoIdioma        PuestoIdioma[]
+  Candidato           Candidato[]
+  Empleado            Empleado[]
+}
+
+model PuestoCompetencia {
+  id_puesto_competencia Int   @id @default(autoincrement())
+  puesto_id            Int
+  competencia_id       Int
+  Puesto               Puesto       @relation(fields: [puesto_id], references: [id_puesto])
+  Competencia          Competencia  @relation(fields: [competencia_id], references: [id_competencia])
+}
+
+model PuestoIdioma {
+  id         Int    @id @default(autoincrement())
+  puesto_id  Int
+  idioma_id  Int
+  Puesto     Puesto   @relation(fields: [puesto_id], references: [id_puesto])
+  Idioma     Idioma   @relation(fields: [idioma_id], references: [id_idioma])
+}
+
+model Candidato {
+  id_candidato        Int                 @id @default(autoincrement())
+  cedula              String              @unique
+  nombre              String
+  puesto_aspirado_id  Int
+  departamento_id     Int
+  salario_aspirado    Float               @default(0.0)
+  recomendado_por     String
+  estado_id           Int
+  estado              Boolean             @default(true)
+  Capacitacion        Capacitacion[]
+  ExperienciaLaboral  ExperienciaLaboral[]
+  CandidatoCompetencia CandidatoCompetencia[]
+  Puesto              Puesto            @relation(fields: [puesto_aspirado_id], references: [id_puesto])
+  Estado              Estado            @relation(fields: [estado_id], references: [id_estado])
+  Departamento        Departamento      @relation(fields: [departamento_id], references: [id_departamento])
+}
+
+model CandidatoCompetencia {
+  id_puesto_competencia Int   @id @default(autoincrement())
+  candidato_id          Int
+  competencia_id        Int
+  Candidato             Candidato  @relation(fields: [candidato_id], references: [id_candidato])
+  Competencia           Competencia @relation(fields: [competencia_id], references: [id_competencia])
+}
+
+model ExperienciaLaboral {
+  id_experiencia_laboral Int    @id @default(autoincrement())
+  candidato_id           Int
+  empresa                String
+  puesto_ocupado         String
+  fecha_desde            DateTime
+  fecha_hasta            DateTime
+  salario                Float     @default(0.0)
+  Candidato              Candidato @relation(fields: [candidato_id], references: [id_candidato])
+}
+
+model Empleado {
+  id_empleado     Int     @id @default(autoincrement())
+  cedula          String
+  nombre          String
+  fecha_ingreso   DateTime
+  puesto_id       Int
+  departamento_id    Int
+  salario_mensual Float     @default(0.0)
+  estado          Boolean   @default(true)
+  fecha_creacion  DateTime  @default(now())
+  Puesto          Puesto    @relation(fields: [puesto_id], references: [id_puesto])
+  Departamento    Departamento @relation(fields: [departamento_id], references: [id_departamento])
+  Usuario         Usuario[]
+}
+
+model Usuario {
+  id_usuario  Int     @id @default(autoincrement())
+  empleado_id Int
+  user      String
+  password    String
+  rol_id      Int
+  estado      Boolean   @default(true)
+  Empleado    Empleado @relation(fields: [empleado_id], references: [id_empleado])
+  Rol         Rol      @relation(fields: [rol_id], references: [id_rol])
+}
+
+model Rol {
+  id_rol Int        @id @default(autoincrement())
+  nombre String
+  estado Boolean    @default(true)
+  Usuario Usuario[]
+}
+
+model Departamento {
+  id_departamento Int   @id @default(autoincrement())
+  nombre          String
+  estado          Boolean   @default(true)
+  Empleado        Empleado[]
+  Candidato       Candidato[]
+}
+
+model Estado {
+  id_estado   Int     @id @default(autoincrement())
+  descripcion String
+  estado      Boolean @default(true)
+  Candidato   Candidato[]
+}
+
