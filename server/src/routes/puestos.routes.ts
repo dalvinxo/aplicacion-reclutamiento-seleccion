@@ -7,9 +7,8 @@ const router = express.Router();
 
 router.get("/", async (_req, res, next) => {
   try {
-    const roles = await prisma.rol.findMany();
-
-    res.json(roles);
+    const puestos = await prisma.puesto.findMany();
+    res.json(puestos);
   } catch (error) {
     next(error);
   }
@@ -17,11 +16,11 @@ router.get("/", async (_req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const rol = await prisma.rol.create({
+    const puesto = await prisma.puesto.create({
       data: req.body,
     });
 
-    res.status(EnumHttpCode.CREATED).json(rol);
+    res.status(EnumHttpCode.CREATED).json(puesto);
   } catch (error) {
     next(error);
   }
@@ -29,11 +28,11 @@ router.post("/", async (req, res, next) => {
 
 router.post("/multiples", async (req, res, next) => {
   try {
-    const roles = await prisma.rol.createMany({
+    const puestos = await prisma.puesto.createMany({
       data: req.body,
     });
 
-    res.status(EnumHttpCode.CREATED).json(roles);
+    res.status(EnumHttpCode.CREATED).json(puestos);
   } catch (error) {
     next(error);
   }
@@ -41,18 +40,20 @@ router.post("/multiples", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const rol = await prisma.rol.findUnique({
+    const puesto = await prisma.puesto.findUnique({
       where: {
-        id_rol: Number(req.params.id),
+        id_puesto: Number(req.params.id),
       },
     });
 
-    if (!rol) {
-      res.status(EnumHttpCode.NOT_FOUND).json({ message: "El rol no existe" });
+    if (!puesto) {
+      res
+        .status(EnumHttpCode.NOT_FOUND)
+        .json({ message: "El idioma no existe" });
       return;
     }
 
-    res.json(rol);
+    res.json(puesto);
   } catch (error) {
     next(error);
   }
@@ -60,9 +61,9 @@ router.get("/:id", async (req, res, next) => {
 
 router.delete("/:id", async (req, res, next) => {
   try {
-    await prisma.rol.delete({
+    await prisma.puesto.delete({
       where: {
-        id_rol: Number(req.params.id),
+        id_puesto: Number(req.params.id),
       },
     });
 
@@ -74,13 +75,13 @@ router.delete("/:id", async (req, res, next) => {
 
 router.patch("/:id", async (req, res, next) => {
   try {
-    const rol = await prisma.rol.update({
+    const puesto = await prisma.puesto.update({
       where: {
-        id_rol: Number(req.params.id),
+        id_puesto: Number(req.params.id),
       },
       data: req.body,
     });
-    res.json(rol);
+    res.json(puesto);
   } catch (error) {
     next(error);
   }

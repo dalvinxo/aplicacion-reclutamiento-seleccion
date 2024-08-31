@@ -3,6 +3,7 @@ import morgan from 'morgan'
 
 
 import rolesRouter from './routes/roles.routes'
+import departamentosRouter from './routes/departamentos.routes'
 
 const app = express()
 
@@ -18,6 +19,10 @@ app.get('/ping', (_req, res) => {
 })
 
 app.use('/api/roles', rolesRouter)
+app.use('/api/departamentos', departamentosRouter)
+// app.use('/api/')
+
+
 
 
 app.listen(PORT, ()=>{

@@ -7,9 +7,8 @@ const router = express.Router();
 
 router.get("/", async (_req, res, next) => {
   try {
-    const roles = await prisma.rol.findMany();
-
-    res.json(roles);
+    const competencias = await prisma.competencia.findMany();
+    res.json(competencias);
   } catch (error) {
     next(error);
   }
@@ -17,11 +16,11 @@ router.get("/", async (_req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const rol = await prisma.rol.create({
+    const competencia = await prisma.competencia.create({
       data: req.body,
     });
 
-    res.status(EnumHttpCode.CREATED).json(rol);
+    res.status(EnumHttpCode.CREATED).json(competencia);
   } catch (error) {
     next(error);
   }
@@ -29,11 +28,11 @@ router.post("/", async (req, res, next) => {
 
 router.post("/multiples", async (req, res, next) => {
   try {
-    const roles = await prisma.rol.createMany({
+    const competencias = await prisma.competencia.createMany({
       data: req.body,
     });
 
-    res.status(EnumHttpCode.CREATED).json(roles);
+    res.status(EnumHttpCode.CREATED).json(competencias);
   } catch (error) {
     next(error);
   }
@@ -41,18 +40,24 @@ router.post("/multiples", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const rol = await prisma.rol.findUnique({
+    const competencia = await prisma.competencia.findUnique({
       where: {
-        id_rol: Number(req.params.id),
+        id_competencia: Number(req.params.id),
+      },
+      include: {
+        PersonaCompetencia: true,
+        PuestoCompetencia: true,
       },
     });
 
-    if (!rol) {
-      res.status(EnumHttpCode.NOT_FOUND).json({ message: "El rol no existe" });
+    if (!competencia) {
+      res
+        .status(EnumHttpCode.NOT_FOUND)
+        .json({ message: "La competencia no existe" });
       return;
     }
 
-    res.json(rol);
+    res.json(competencia);
   } catch (error) {
     next(error);
   }
@@ -60,9 +65,9 @@ router.get("/:id", async (req, res, next) => {
 
 router.delete("/:id", async (req, res, next) => {
   try {
-    await prisma.rol.delete({
+    await prisma.competencia.delete({
       where: {
-        id_rol: Number(req.params.id),
+        id_competencia: Number(req.params.id),
       },
     });
 
@@ -74,13 +79,13 @@ router.delete("/:id", async (req, res, next) => {
 
 router.patch("/:id", async (req, res, next) => {
   try {
-    const rol = await prisma.rol.update({
+    const competencia = await prisma.competencia.update({
       where: {
-        id_rol: Number(req.params.id),
+        id_competencia: Number(req.params.id),
       },
       data: req.body,
     });
-    res.json(rol);
+    res.json(competencia);
   } catch (error) {
     next(error);
   }
