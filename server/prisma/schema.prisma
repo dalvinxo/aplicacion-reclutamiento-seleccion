@@ -60,7 +60,7 @@ model PuestoCompetencia {
 }
 
 model PuestoIdioma {
-  id         Int      @id @default(autoincrement())
+  id_puesto_idioma         Int      @id @default(autoincrement())
   puesto_id  Int
   idioma_id  Int
   Puesto     Puesto   @relation(fields: [puesto_id], references: [id_puesto])
@@ -68,11 +68,19 @@ model PuestoIdioma {
 }
 
 model PersonaIdioma {
-  id         Int        @id @default(autoincrement())
+  id_persona_idioma         Int        @id @default(autoincrement())
   persona_id Int
   idioma_id  Int
   Persona    Persona   @relation(fields: [persona_id], references: [id_persona])
   Idioma     Idioma     @relation(fields: [idioma_id], references: [id_idioma])
+}
+
+model PersonaCompetencia {
+  id_persona_competencia Int   @id @default(autoincrement())
+  persona_id            Int
+  competencia_id        Int
+  Persona               Persona  @relation(fields: [persona_id], references: [id_persona])
+  Competencia           Competencia @relation(fields: [competencia_id], references: [id_competencia])
 }
 
 model Candidato {
@@ -90,13 +98,7 @@ model Candidato {
   Persona               Persona             @relation(fields: [persona_id], references: [id_persona])
 }
 
-model PersonaCompetencia {
-  id_puesto_competencia Int   @id @default(autoincrement())
-  persona_id            Int
-  competencia_id        Int
-  Persona               Persona  @relation(fields: [persona_id], references: [id_persona])
-  Competencia           Competencia @relation(fields: [competencia_id], references: [id_competencia])
-}
+
 
 model ExperienciaLaboral {
   id_experiencia_laboral Int        @id @default(autoincrement())
