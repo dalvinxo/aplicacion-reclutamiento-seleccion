@@ -59,6 +59,61 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
+  try {
+    const puesto = await prisma.puesto.findUnique({
+      where: {
+        id_puesto: Number(req.params.id),
+      },
+      select: {
+        id_puesto: true,
+        nombre: true,
+        descripcion: true,
+        nivel_riesgo: true,
+        nivel_minimo_salario: true,
+        nivel_maximo_salario: true,
+        PuestoIdioma: {
+          select: {
+            Idioma: {
+              select: {
+                nombre: true,
+              },
+            },
+          },
+        },
+        PuestoCompetencia: {
+          select: {
+            Competencia: {
+              select: {
+                descripcion: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!puesto) {
+      res
+        .status(EnumHttpCode.NOT_FOUND)
+        .json({ message: "El idioma no existe" });
+      return;
+    }
+
+    const puestoConCompetenciaYIdioma = {
+      ...puesto,
+      PuestoIdioma: puesto.PuestoIdioma.map((idiomas) => idiomas.Idioma.nombre),
+      PuestoCompetencia: puesto.PuestoCompetencia.map(
+        (competencias) => competencias.Competencia.descripcion
+      ),
+    };
+
+    res.json(puestoConCompetenciaYIdioma);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.delete("/:id", async (req, res, next) => {
   try {
     await prisma.puesto.delete({

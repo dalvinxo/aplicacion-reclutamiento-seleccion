@@ -90,10 +90,10 @@ model Candidato {
   departamento_id       Int
   salario_aspirado      Float               @default(0.0)
   recomendado_por       String
-  estado_id             Int
+  estado_candidato_id   Int
   estado                Boolean             @default(true)
   Puesto                Puesto              @relation(fields: [puesto_aspirado_id], references: [id_puesto])
-  Estado                Estado              @relation(fields: [estado_id], references: [id_estado])
+  EstadoCandidato       EstadoCandidato     @relation(fields: [estado_candidato_id], references: [id_estado_candidato])
   Departamento          Departamento        @relation(fields: [departamento_id], references: [id_departamento])
   Persona               Persona             @relation(fields: [persona_id], references: [id_persona])
 }
@@ -152,11 +152,11 @@ model Departamento {
   Candidato       Candidato[]
 }
 
-model Estado {
-  id_estado   Int     @id @default(autoincrement())
-  descripcion String  @unique
-  estado      Boolean @default(true)
-  Candidato   Candidato[]
+model EstadoCandidato {
+  id_estado_candidato   Int     @id @default(autoincrement())
+  descripcion           String  @unique
+  estado                Boolean @default(true)
+  Candidato             Candidato[]
 }
 
 model Persona {
