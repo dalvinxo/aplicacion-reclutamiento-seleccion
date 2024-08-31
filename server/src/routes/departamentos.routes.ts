@@ -28,11 +28,11 @@ router.post("/", async (req, res, next) => {
 
 router.post("/multiples", async (req, res, next) => {
   try {
-    const competencias = await prisma.competencia.createMany({
+    const departamentos = await prisma.departamento.createMany({
       data: req.body,
     });
 
-    res.status(EnumHttpCode.CREATED).json(competencias);
+    res.status(EnumHttpCode.CREATED).json(departamentos);
   } catch (error) {
     next(error);
   }
