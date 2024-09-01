@@ -1,7 +1,7 @@
 import express from "express";
 
 import { prisma } from "../libs/prisma";
-import { EnumHttpCode } from "../types";
+import { EnumHttpCode, ICreatePerson } from "../types";
 
 const router = express.Router();
 
@@ -16,11 +16,74 @@ router.get("/", async (_req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const candidato = await prisma.candidato.create({
+    const candidatos = await prisma.candidato.create({
       data: req.body,
     });
 
-    res.status(EnumHttpCode.CREATED).json(candidato);
+    res.status(EnumHttpCode.CREATED).json(candidatos);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/detalles", async (req, res, next) => {
+  try {
+    const {
+      puesto_aspirado_id,
+      salario_aspirado,
+      recomendado_por,
+      estado_candidato_id,
+      persona,
+    } = req.body;
+
+    const {
+      cedula,
+      nombre,
+      competencias = [],
+      capacitaciones = [],
+      experienciaLaboral = [],
+      idiomas = [],
+    } = persona as ICreatePerson;
+
+    const personaCandidato = await prisma.persona.create({
+      data: {
+        cedula: cedula,
+        nombre: nombre,
+        PersonaCompetencia: {
+          create: competencias.map((competencia) => ({
+            competencia_id: competencia.competencia_id,
+          })),
+        },
+        PersonaIdioma: {
+          create: idiomas.map((idioma) => ({
+            idioma_id: idioma.idioma_id,
+          })),
+        },
+        ExperienciaLaboral: {
+          create: experienciaLaboral,
+        },
+        Capacitacion: {
+          create: capacitaciones,
+        },
+        Candidato: {
+          create: {
+            puesto_aspirado_id: puesto_aspirado_id,
+            salario_aspirado: salario_aspirado,
+            recomendado_por: recomendado_por,
+            estado_candidato_id: estado_candidato_id,
+          },
+        },
+      },
+      include: {
+        Capacitacion: true,
+        ExperienciaLaboral: true,
+        PersonaCompetencia: true,
+        PersonaIdioma: true,
+        Candidato: true,
+      },
+    });
+
+    res.status(EnumHttpCode.CREATED).json(personaCandidato);
   } catch (error) {
     next(error);
   }

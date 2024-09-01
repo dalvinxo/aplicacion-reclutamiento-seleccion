@@ -38,13 +38,15 @@ model Capacitacion {
 }
 
 model Puesto {
-  id_puesto           Int                 @id @default(autoincrement())
-  nombre              String              @unique
-  descripcion          String        
-  nivel_riesgo        String              
-  nivel_minimo_salario Float              @default(0.0)
-  nivel_maximo_salario Float              @default(0.0)
-  estado              Boolean             @default(true)
+  id_puesto             Int                @id @default(autoincrement())
+  departamento_id       Int                @default(1)
+  nombre                String             @unique
+  descripcion           String        
+  nivel_riesgo          String              
+  nivel_minimo_salario  Float              @default(0.0)
+  nivel_maximo_salario  Float              @default(0.0)
+  estado                Boolean            @default(true)
+  Departamento          Departamento       @relation(fields: [departamento_id], references: [id_departamento])
   PuestoCompetencia   PuestoCompetencia[]
   PuestoIdioma        PuestoIdioma[]
   Candidato           Candidato[]
@@ -87,14 +89,12 @@ model Candidato {
   id_candidato          Int                 @id @default(autoincrement())
   persona_id            Int
   puesto_aspirado_id    Int
-  departamento_id       Int
   salario_aspirado      Float               @default(0.0)
   recomendado_por       String
   estado_candidato_id   Int
   estado                Boolean             @default(true)
   Puesto                Puesto              @relation(fields: [puesto_aspirado_id], references: [id_puesto])
   EstadoCandidato       EstadoCandidato     @relation(fields: [estado_candidato_id], references: [id_estado_candidato])
-  Departamento          Departamento        @relation(fields: [departamento_id], references: [id_departamento])
   Persona               Persona             @relation(fields: [persona_id], references: [id_persona])
 }
 
@@ -112,17 +112,15 @@ model ExperienciaLaboral {
 }
 
 model Empleado {
-  id_empleado     Int     @id @default(autoincrement())
+  id_empleado     Int         @id @default(autoincrement())
   persona_id      Int
   fecha_ingreso   DateTime
   puesto_id       Int
-  departamento_id Int
-  salario_mensual Float     @default(0.0)
-  estado          Boolean   @default(true)
-  fecha_creacion  DateTime  @default(now())
-  Puesto          Puesto    @relation(fields: [puesto_id], references: [id_puesto])
-  Persona          Persona    @relation(fields: [persona_id], references: [id_persona])
-  Departamento    Departamento @relation(fields: [departamento_id], references: [id_departamento])
+  salario_mensual Float       @default(0.0)
+  estado          Boolean     @default(true)
+  fecha_creacion  DateTime    @default(now())
+  Puesto          Puesto      @relation(fields: [puesto_id], references: [id_puesto])
+  Persona         Persona     @relation(fields: [persona_id], references: [id_persona])
   Usuario         Usuario[]
 }
 
@@ -145,23 +143,22 @@ model Rol {
 }
 
 model Departamento {
-  id_departamento Int   @id @default(autoincrement())
+  id_departamento Int       @id @default(autoincrement())
   nombre          String    @unique
   estado          Boolean   @default(true)
-  Empleado        Empleado[]
-  Candidato       Candidato[]
+  Puesto          Puesto[]
 }
 
 model EstadoCandidato {
-  id_estado_candidato   Int     @id @default(autoincrement())
-  descripcion           String  @unique
-  estado                Boolean @default(true)
+  id_estado_candidato   Int         @id @default(autoincrement())
+  descripcion           String      @unique
+  estado                Boolean     @default(true)
   Candidato             Candidato[]
 }
 
 model Persona {
-  id_persona  Int     @id @default(autoincrement())
-  cedula      String  @unique
+  id_persona  Int       @id @default(autoincrement())
+  cedula      String    @unique
   nombre      String
   estado      Boolean   @default(true)
   Candidato             Candidato[]

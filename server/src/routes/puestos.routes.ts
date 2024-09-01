@@ -74,6 +74,7 @@ router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
         nivel_maximo_salario: true,
         PuestoIdioma: {
           select: {
+            id_puesto_idioma: true,
             Idioma: {
               select: {
                 nombre: true,
@@ -83,8 +84,10 @@ router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
         },
         PuestoCompetencia: {
           select: {
+            id_puesto_competencia: true,
             Competencia: {
               select: {
+                id_competencia: true,
                 descripcion: true,
               },
             },
@@ -96,7 +99,7 @@ router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
     if (!puesto) {
       res
         .status(EnumHttpCode.NOT_FOUND)
-        .json({ message: "El idioma no existe" });
+        .json({ message: "El puesto consultado no existe" });
       return;
     }
 
