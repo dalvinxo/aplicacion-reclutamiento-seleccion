@@ -9,6 +9,23 @@ import { authorize } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
+router.post("/logout", (_req, res) => {
+  try {
+    res
+      .clearCookie("access_token", {
+        httpOnly: true,
+        secure: NODE_ENV === "production",
+        sameSite: "strict",
+      })
+      .status(EnumHttpCode.OK)
+      .json({ message: "Se cerró sesión correctamente" });
+  } catch (error) {
+    res
+      .status(EnumHttpCode.INTERNAL_SERVER_ERROR)
+      .json({ message: "Ha ocurrido un error cerrando sesión" });
+  }
+});
+
 router.post("/login", async (req, res, next) => {
   try {
     const { username, password } = req.body;

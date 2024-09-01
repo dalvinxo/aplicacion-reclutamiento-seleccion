@@ -7,7 +7,7 @@ export enum EnumHttpCode {
   BAD_REQUEST = 400,
   UNAUTHORIZE = 401,
   NO_CONTENT = 204,
-  ERROR_SERVER = 500,
+  INTERNAL_SERVER_ERROR = 500,
 }
 
 export enum EnumRoles {

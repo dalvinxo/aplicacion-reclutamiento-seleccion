@@ -18,13 +18,8 @@ export const Login = () => {
           backgroundColor: 'inherit',
           mx: 'auto',
           overflow: 'auto',
-          //   resize: 'horizontal',
         }}
       >
-        {/* <Typography variant="h6" gutterBottom sx={{ padding: '0.7rem', in }}>
-          <LoginIcon /> Iniciar Sesión
-        </Typography> */}
-
         <Typography
           variant="h6"
           gutterBottom
