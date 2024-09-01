@@ -2,9 +2,20 @@ export enum EnumHttpCode {
   OK = 200,
   NOT_FOUND = 404,
   CREATED = 201,
-  BAD_REQUEST = 401,
+  BAD_REQUEST = 400,
+  UNAUTHORIZE = 401,
   NO_CONTENT = 204,
   ERROR_SERVER = 500,
+}
+
+export enum EnumRoles {
+  ADMIN = 1,
+  USER = 2,
+}
+
+export enum EnumStatusCandidato {
+  POSTULADO = 1,
+  CONTRADO = 2,
 }
 
 export interface ICapacitaciones {

@@ -131,6 +131,7 @@ model Usuario {
   password    String
   rol_id      Int
   estado      Boolean   @default(true)
+  ultimo_login DateTime @default(now())
   Empleado    Empleado  @relation(fields: [empleado_id], references: [id_empleado])
   Rol         Rol       @relation(fields: [rol_id], references: [id_rol])
 }

@@ -1,7 +1,7 @@
 import express from "express";
 
 import { prisma } from "../libs/prisma";
-import { EnumHttpCode, ICreatePerson } from "../types";
+import { EnumHttpCode, EnumStatusCandidato, ICreatePerson } from "../types";
 
 const router = express.Router();
 
@@ -28,13 +28,8 @@ router.post("/", async (req, res, next) => {
 
 router.post("/detalles", async (req, res, next) => {
   try {
-    const {
-      puesto_aspirado_id,
-      salario_aspirado,
-      recomendado_por,
-      estado_candidato_id,
-      persona,
-    } = req.body;
+    const { puesto_aspirado_id, salario_aspirado, recomendado_por, persona } =
+      req.body;
 
     const {
       cedula,
@@ -70,7 +65,7 @@ router.post("/detalles", async (req, res, next) => {
             puesto_aspirado_id: puesto_aspirado_id,
             salario_aspirado: salario_aspirado,
             recomendado_por: recomendado_por,
-            estado_candidato_id: estado_candidato_id,
+            estado_candidato_id: EnumStatusCandidato.POSTULADO,
           },
         },
       },
@@ -145,6 +140,50 @@ router.patch("/:id", async (req, res, next) => {
       data: req.body,
     });
     res.json(candidato);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.patch("/:id/contratar", async (req, res, next) => {
+  try {
+    const { fecha_ingreso, salario_mensual } = req.body;
+
+    if (!fecha_ingreso || !salario_mensual) {
+      res
+        .status(EnumHttpCode.BAD_REQUEST)
+        .json({ message: "Falta información para contratar al candidato" });
+
+      return;
+    }
+
+    const result = await prisma.$transaction(async (prisma) => {
+      const candidato = await prisma.candidato.update({
+        where: {
+          id_candidato: Number(req.params.id),
+        },
+        data: {
+          estado_candidato_id: EnumStatusCandidato.CONTRADO,
+          estado: false,
+        },
+      });
+
+      const empleado = await prisma.empleado.create({
+        data: {
+          fecha_ingreso,
+          salario_mensual,
+          persona_id: candidato.persona_id,
+          puesto_id: candidato.puesto_aspirado_id,
+        },
+        include: {
+          Persona: true,
+        },
+      });
+
+      return empleado;
+    });
+
+    res.json(result);
   } catch (error) {
     next(error);
   }

@@ -1,7 +1,10 @@
 import express from 'express'
 import morgan from 'morgan'
 
+import authRouter from './routes/auth.routes'
+import usuariosRouter from './routes/usuarios.routes'
 
+import empleadosRouter from './routes/empleados.routes'
 import rolesRouter from './routes/roles.routes'
 import puestosRouter from './routes/puestos.routes'
 import idiomasRouter from './routes/idiomas.routes'
@@ -24,6 +27,7 @@ app.use(morgan('tiny'));
 
 app.use(express.json())
 
+
 const PORT = 3000
 
 app.get('/ping', (_req, res) => {
@@ -31,9 +35,14 @@ app.get('/ping', (_req, res) => {
     res.send('pong')
 })
 
+app.use('/api/auth', authRouter)
+app.use('/api/usuarios', usuariosRouter)
+app.use('/api/empleados', empleadosRouter)
+
 app.use('/api/roles', rolesRouter)
 app.use('/api/idiomas', idiomasRouter)
 app.use('/api/puestos', puestosRouter)
+app.use('/api/roles', rolesRouter)
 app.use('/api/competencias', competenciasRouter)
 app.use('/api/departamentos', departamentosRouter)
 app.use('/api/puestosIdiomas', puestosIdiomasRouter)
