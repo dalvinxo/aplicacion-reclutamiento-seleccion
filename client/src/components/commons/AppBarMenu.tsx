@@ -9,10 +9,12 @@ import {
   Box,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
-import MenuIcon from '@mui/icons-material/Menu';
-import ThemeIcon from '@mui/icons-material/Brightness4';
+
 import { useState } from 'react';
 import { useThemeContext } from '../../context/ThemeContext';
+
+import MenuIcon from '@mui/icons-material/Menu';
+import ThemeIcon from '@mui/icons-material/Brightness4';
 
 export const AppBarMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
