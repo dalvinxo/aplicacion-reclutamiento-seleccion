@@ -1,5 +1,6 @@
 import express from 'express'
 import morgan from 'morgan'
+import cookieParser from 'cookie-parser'
 
 import authRouter from './routes/auth.routes'
 import usuariosRouter from './routes/usuarios.routes'
@@ -21,14 +22,19 @@ import personasIdiomasRouter from './routes/personasIdiomas.routes'
 import experienciasLaboralesRouter from './routes/experienciasLaborales.routes'
 import personasCompetenciasRouter from './routes/personasCompetencias.routes'
 
+import { authorize } from './middleware/auth.middleware'
+
+
+
+import { PORT } from './utils/config'
+import { EnumRoles } from './types'
+
 const app = express()
 
 app.use(morgan('tiny'));
 
 app.use(express.json())
-
-
-const PORT = 3000
+app.use(cookieParser())
 
 app.get('/ping', (_req, res) => {
     console.log('someone pinged here!!')
@@ -36,24 +42,28 @@ app.get('/ping', (_req, res) => {
 })
 
 app.use('/api/auth', authRouter)
-app.use('/api/usuarios', usuariosRouter)
-app.use('/api/empleados', empleadosRouter)
 
-app.use('/api/roles', rolesRouter)
-app.use('/api/idiomas', idiomasRouter)
-app.use('/api/puestos', puestosRouter)
-app.use('/api/roles', rolesRouter)
-app.use('/api/competencias', competenciasRouter)
-app.use('/api/departamentos', departamentosRouter)
-app.use('/api/puestosIdiomas', puestosIdiomasRouter)
-app.use('/api/puestosCompetencias', puestosCompetenciasRouter)
-app.use('/api/personas', personasRouter)
+app.use(authorize([EnumRoles.ADMIN]))
+app.use('/api/usuarios', usuariosRouter)
+app.use(authorize([EnumRoles.USER, EnumRoles.ADMIN]))
 app.use('/api/candidatos', candidatosRouter)
+app.use('/api/personas', personasRouter)
 app.use('/api/capacitaciones', capacitacionesRouter)
-app.use('/api/estadosCandidatos', estadosCandidatos)
 app.use('/api/personasIdiomas', personasIdiomasRouter)
 app.use('/api/experienciasLaborales', experienciasLaboralesRouter)
 app.use('/api/personasCompetencias', personasCompetenciasRouter)
+app.use('/api/empleados', empleadosRouter)
+app.use('/api/roles', rolesRouter)
+app.use('/api/idiomas', idiomasRouter)
+app.use('/api/puestos', puestosRouter)
+app.use('/api/departamentos', departamentosRouter)
+app.use('/api/roles', rolesRouter)
+app.use('/api/competencias', competenciasRouter)
+app.use('/api/puestosIdiomas', puestosIdiomasRouter)
+app.use('/api/puestosCompetencias', puestosCompetenciasRouter)
+app.use('/api/estadosCandidatos', estadosCandidatos)
+
+
 
 app.listen(PORT, ()=>{
     console.log(`server is running on port ${PORT}`)

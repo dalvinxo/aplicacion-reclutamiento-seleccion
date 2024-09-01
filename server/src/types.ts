@@ -1,3 +1,5 @@
+import { Request } from "express";
+
 export enum EnumHttpCode {
   OK = 200,
   NOT_FOUND = 404,
@@ -11,6 +13,16 @@ export enum EnumHttpCode {
 export enum EnumRoles {
   ADMIN = 1,
   USER = 2,
+}
+
+export interface RequestCustom<T> extends Request {
+  user: T;
+}
+
+export interface PayloadJwt {
+  usuario_id: number;
+  empleado_id: number;
+  rol: number;
 }
 
 export enum EnumStatusCandidato {
