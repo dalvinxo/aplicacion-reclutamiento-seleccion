@@ -20,7 +20,6 @@ const baseQueryWithReauth: TypeBaseQuery = async (args, api, extraOptions) => {
         const user = (api.getState() as RootState).auth.user;
 
         if (user) {
-          console.log('reiniciar');
           await baseQuery(endpoints.auth.logout, api, extraOptions);
         }
       }

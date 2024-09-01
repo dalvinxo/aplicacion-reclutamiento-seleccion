@@ -7,9 +7,20 @@ declare global {
     unknown
   >;
 
+  interface IException extends Error {
+    data: {
+      message: string;
+    };
+    status: number;
+  }
+
   interface SomeGlobalInterface {
     // Define global interface members here
   }
 
-  // Añade más tipos globales aquí
+  interface IUseAlert {
+    styles?: React.CSSProperties;
+    defaultVariant?: 'filled' | 'outlined' | 'standard';
+    defaultSeverity?: 'error' | 'warning' | 'info' | 'success';
+  }
 }

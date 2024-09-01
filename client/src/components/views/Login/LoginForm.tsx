@@ -11,6 +11,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useLoginMutation } from '../../../features/auth/authApiSlice';
 import { SpinnerCircularProgress } from '../../commons/SpinnerCircularProgress';
+import useAlert from '../../../hook/useAlert';
 
 interface ILoginForm {
   username: string;
@@ -19,6 +20,7 @@ interface ILoginForm {
 
 const LoginForm = () => {
   const [login, { isLoading }] = useLoginMutation();
+  const { AlertComponent, setError } = useAlert();
 
   const {
     register,
@@ -39,11 +41,9 @@ const LoginForm = () => {
       .then((response) => {
         console.log(response);
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((error: IException) => {
+        setError(error.data.message);
       });
-
-    console.log('Inicio de sesión exitoso', data);
   };
 
   return (
@@ -101,6 +101,7 @@ const LoginForm = () => {
         </Button>
 
         {isLoading && <SpinnerCircularProgress />}
+        <AlertComponent />
       </Stack>
     </Box>
   );
