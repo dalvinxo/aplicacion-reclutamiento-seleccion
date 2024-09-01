@@ -1,35 +1,86 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Layout } from './components/layouts/Layout';
+import { blue, grey } from '@mui/material/colors';
+import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { useThemeContext } from './context/ThemeContext';
+
+import { Login } from './components/views/Login/Login';
+import { Home } from './components/views/Home/Home';
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Layout />,
+    children: [
+      {
+        index: true,
+        element: <Home />,
+      },
+      {
+        path: 'login',
+        element: <Login />,
+      },
+    ],
+  },
+]);
+
+// Definición del tema claro
+const lightTheme = createTheme({
+  palette: {
+    mode: 'light',
+    primary: {
+      main: blue[700],
+    },
+    secondary: {
+      main: grey[600],
+    },
+    background: {
+      default: '#fff',
+      paper: '#FFFFFF',
+    },
+    text: {
+      primary: '#000000',
+      secondary: grey[700],
+    },
+  },
+});
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    primary: {
+      main: blue[500],
+    },
+    secondary: {
+      main: grey[400],
+    },
+    background: {
+      default: '#212121',
+      paper: '#303030',
+    },
+    text: {
+      primary: '#FFFFFF',
+      secondary: grey[500],
+    },
+  },
+});
 
 function App() {
-  const [count, setCount] = useState(0);
-
+  const { theme } = useThemeContext();
+  console.log(theme);
   return (
-    <>
-      <div>
-        <p>creando</p>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
+      <CssBaseline />
+      <Box
+        sx={{
+          bgcolor: 'background.default',
+          minHeight: '100vh',
+          padding: '1rem',
+        }}
+      >
+        <RouterProvider router={router} />
+      </Box>
+    </ThemeProvider>
   );
 }
 
