@@ -9,6 +9,8 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useLoginMutation } from '../../../features/auth/authApiSlice';
+import { SpinnerCircularProgress } from '../../commons/SpinnerCircularProgress';
 
 interface ILoginForm {
   username: string;
@@ -16,6 +18,8 @@ interface ILoginForm {
 }
 
 const LoginForm = () => {
+  const [login, { isLoading }] = useLoginMutation();
+
   const {
     register,
     handleSubmit,
@@ -23,13 +27,23 @@ const LoginForm = () => {
   } = useForm<ILoginForm>();
   const [showPassword, setShowPassword] = React.useState(false);
 
-  const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
-    // Lógica para iniciar sesión
-    console.log('Inicio de sesión exitoso', data);
-  };
-
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
+  };
+
+  const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
+    // Lógica para iniciar sesión
+
+    await login({ ...data })
+      .unwrap()
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    console.log('Inicio de sesión exitoso', data);
   };
 
   return (
@@ -77,9 +91,16 @@ const LoginForm = () => {
             },
           }}
         />
-        <Button type="submit" variant="contained" color="primary">
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={isLoading}
+        >
           Iniciar sesión
         </Button>
+
+        {isLoading && <SpinnerCircularProgress />}
       </Stack>
     </Box>
   );

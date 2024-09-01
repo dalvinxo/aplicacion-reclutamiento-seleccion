@@ -13,7 +13,6 @@ import competenciasRouter from './routes/competencias.routes'
 import departamentosRouter from './routes/departamentos.routes'
 import puestosIdiomasRouter from './routes/puestosIdiomas.routes'
 import puestosCompetenciasRouter from './routes/puestosCompetencias.routes'
-
 import personasRouter from './routes/personas.routes'
 import candidatosRouter from './routes/candidatos.routes'
 import capacitacionesRouter from './routes/capacitaciones.routes'
@@ -24,9 +23,8 @@ import personasCompetenciasRouter from './routes/personasCompetencias.routes'
 
 import { authorize } from './middleware/auth.middleware'
 
-
-
 import { PORT } from './utils/config'
+
 import { EnumRoles } from './types'
 
 const app = express()

@@ -1,12 +1,12 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { logOut } from '../features/auth/authSlice';
+import { endpoints } from './endpoints';
+import { RootState } from '../store';
+import { DEV, VITE_VERSION_API } from '../constants/config';
 
 const baseQuery: TypeBaseQuery = fetchBaseQuery({
-  baseUrl: 'http://localhost:3000/api/',
+  baseUrl: DEV ? VITE_VERSION_API : 'http://localhost:3000/api/',
   credentials: 'include',
-  prepareHeaders: (headers, { getState }) => {
-    return headers;
-  },
 });
 
 const baseQueryWithReauth: TypeBaseQuery = async (args, api, extraOptions) => {
@@ -17,16 +17,18 @@ const baseQueryWithReauth: TypeBaseQuery = async (args, api, extraOptions) => {
       const error = result.error as { status?: number; message?: string };
 
       if (error.status === 401) {
-        const user = (api.getState() as RootStateGlobal).auth.user;
+        const user = (api.getState() as RootState).auth.user;
 
         if (user) {
-          //   const response = await api.endpoints.logOut.initiate();
-          await baseQuery('/auth/logout', api, extraOptions);
+          console.log('reiniciar');
+          await baseQuery(endpoints.auth.logout, api, extraOptions);
         }
       }
     }
   } catch (error) {
-    api.dispatch(logOut);
+    console.error(error);
+  } finally {
+    api.dispatch(logOut({}));
   }
 
   return result;

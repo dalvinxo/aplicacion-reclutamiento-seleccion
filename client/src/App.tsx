@@ -6,6 +6,8 @@ import { useThemeContext } from './context/ThemeContext';
 
 import { Login } from './components/views/Login/Login';
 import { Home } from './components/views/Home/Home';
+import { Provider } from 'react-redux';
+import { store } from './store';
 
 const router = createBrowserRouter([
   {
@@ -78,7 +80,9 @@ function App() {
           padding: '1rem',
         }}
       >
-        <RouterProvider router={router} />
+        <Provider store={store}>
+          <RouterProvider router={router} />
+        </Provider>
       </Box>
     </ThemeProvider>
   );

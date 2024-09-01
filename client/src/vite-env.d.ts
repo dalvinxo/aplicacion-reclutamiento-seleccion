@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  VITE_API_URL: string;
-  VITE_OTHER_VARIABLE: string;
+  VITE_DOMAIN_API: string;
+  VITE_VERSION_API: string;
 }
 
 interface ImportMeta {
