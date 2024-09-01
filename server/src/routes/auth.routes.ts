@@ -78,6 +78,7 @@ router.post("/login", async (req, res, next) => {
       res.status(EnumHttpCode.UNAUTHORIZE).json({
         message: "La contraseña es incorrecta",
       });
+      return;
     }
 
     const { password: _, ...usuario } = user;
