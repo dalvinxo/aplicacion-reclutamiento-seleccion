@@ -16,6 +16,12 @@ export interface Puesto {
   nombre: string;
 }
 
+export interface PuestoDetails extends Puesto {
+  PuestoCompetencia: string[];
+  PuestoIdioma: string[];
+  _count: number;
+}
+
 export interface Departamento {
   id_departamento: number;
   nombre: string;

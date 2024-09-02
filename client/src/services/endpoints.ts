@@ -7,5 +7,7 @@ export const endpoints = {
   puestos: {
     getAll: (pages: number = 1, limit = 10) =>
       `puestos?page=${pages}&limit=${limit}`,
+    getOne: (id: number) => `puestos/${id}`,
+    getOneDetails: (id: number) => `puestos/${id}/competenciasYIdiomas`,
   },
 };

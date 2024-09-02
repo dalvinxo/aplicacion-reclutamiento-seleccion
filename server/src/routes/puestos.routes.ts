@@ -126,6 +126,11 @@ router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
         nivel_riesgo: true,
         nivel_minimo_salario: true,
         nivel_maximo_salario: true,
+        _count: {
+          select: {
+            Candidato: true,
+          },
+        },
         PuestoIdioma: {
           select: {
             id_puesto_idioma: true,
@@ -147,6 +152,12 @@ router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
             },
           },
         },
+        Departamento: {
+          select: {
+            id_departamento: true,
+            nombre: true,
+          },
+        },
       },
     });
 
@@ -159,6 +170,7 @@ router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
 
     const puestoConCompetenciaYIdioma = {
       ...puesto,
+      _count: puesto._count.Candidato,
       PuestoIdioma: puesto.PuestoIdioma.map((idiomas) => idiomas.Idioma.nombre),
       PuestoCompetencia: puesto.PuestoCompetencia.map(
         (competencias) => competencias.Competencia.descripcion
