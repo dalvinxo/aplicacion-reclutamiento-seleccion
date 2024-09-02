@@ -5,6 +5,7 @@ export const endpoints = {
     user: 'auth/user',
   },
   puestos: {
-    getAll: 'puestos',
+    getAll: (pages: number = 1, limit = 10) =>
+      `puestos?page=${pages}&limit=${limit}`,
   },
 };

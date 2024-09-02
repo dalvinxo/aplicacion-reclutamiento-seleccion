@@ -1,10 +1,48 @@
+import { useState } from 'react';
+import { useGetAllPuestosQuery } from '../../../features/puestos/puestosApiSlice';
+import { SpinnerCircularProgress } from '../../commons/SpinnerCircularProgress';
+import { PuestoList } from './PuestoList';
+import { Box, Pagination } from '@mui/material';
+
 export const Home = () => {
+  const [page, setPage] = useState<number>(1);
+
+  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value);
+  };
+
+  const { data, isLoading } = useGetAllPuestosQuery(
+    {
+      pages: page,
+      limit: 6,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+    }
+  );
+
   return (
     <>
-      <div>
-        <h1>Home Page</h1>
-        <p>This is the home page of the application.</p>
-      </div>
+      {isLoading && <SpinnerCircularProgress />}
+      {data && (
+        <>
+          <PuestoList puestos={data} />
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              marginTop: '1.5rem',
+            }}
+          >
+            <Pagination
+              count={data.totalPages}
+              page={page}
+              onChange={handleChange}
+              color="primary"
+            />
+          </Box>
+        </>
+      )}
     </>
   );
 };

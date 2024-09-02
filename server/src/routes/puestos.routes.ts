@@ -7,7 +7,7 @@ import { authorize } from "../middleware/auth.middleware";
 const router = express.Router();
 
 router.get("/", async (req, res, next) => {
-  const { page, limit = 10 } = req.query;
+  const { page, limit } = req.query;
 
   const pages = Number(page || 1);
   const limits = Number(limit || 10);
@@ -43,15 +43,18 @@ router.get("/", async (req, res, next) => {
 
     const totalPages = Math.ceil(totalPuestos / take);
 
+    const puestosPages = puestos.map((puesto) => {
+      const { departamento_id, estado, ...puestoFilter } = puesto;
+      return puestoFilter;
+    });
+
     res.json({
       page: pages,
       limit: limits,
       totalPages: totalPages,
       totalPuestos: totalPuestos,
-      puestos: puestos,
+      puestos: puestosPages,
     });
-
-    res.json(puestos);
   } catch (error) {
     next(error);
   }

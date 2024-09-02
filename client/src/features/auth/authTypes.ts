@@ -12,10 +12,10 @@ export interface AuthUser {
 }
 
 export interface Empleado {
-  Puesto: Puesto;
+  Puesto: PuestoEmpleado;
 }
 
-export interface Puesto {
+export interface PuestoEmpleado {
   Departamento: Departamento;
   nombre: string;
 }
