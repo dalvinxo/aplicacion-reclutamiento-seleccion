@@ -9,6 +9,6 @@ export const LayoutAuth = () => {
   return !!user ? (
     <Outlet />
   ) : (
-    <Navigate to="/login" state={{ from: location }} replace />
+    <Navigate to="/iniciar-sesion" state={{ from: location }} replace />
   );
 };

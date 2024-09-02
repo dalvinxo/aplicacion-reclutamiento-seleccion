@@ -1,8 +1,12 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Layout } from './components/layouts/Layout';
 import { blue, grey } from '@mui/material/colors';
-import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { ThemeProvider } from '@mui/material';
 import { useThemeContext } from './context/ThemeContext';
+
+import CssBaseline from '@mui/material/CssBaseline';
+import Box from '@mui/material/Box';
+import createTheme from '@mui/material/styles/createTheme';
 
 import { Login } from './components/views/Login/Login';
 import { Home } from './components/views/Home/Home';
@@ -13,6 +17,9 @@ import { Maintenance } from './components/views/Maintenance/Maintenance';
 import { Profile } from './components/views/Profile/Profile';
 import { LayoutProtected } from './components/layouts/LayoutProtected';
 import { LayoutAuth } from './components/layouts/LayoutAuth';
+import { Position } from './components/views/Position/Position';
+import { PositionDetails } from './components/views/Position/PositionDetails';
+import { CreateCandidate } from './components/views/Position/CreateCandidate';
 
 const router = createBrowserRouter([
   {
@@ -24,14 +31,33 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
+        path: ':puesto_id',
+        element: <Position />,
+        children: [
+          {
+            index: true,
+            element: <PositionDetails />,
+          },
+          {
+            path: 'crear-candidato',
+            element: <CreateCandidate />,
+          },
+        ],
+      },
+      {
         element: <LayoutProtected />,
-        children: [{ path: 'login', element: <Login /> }],
+        children: [
+          {
+            path: 'iniciar-sesion',
+            element: <Login />,
+          },
+        ],
       },
       {
         element: <LayoutAuth />,
         children: [
           {
-            path: 'cerrar-session',
+            path: 'cerrar-sesion',
             element: <Logout />,
           },
           {
@@ -93,7 +119,6 @@ function App() {
 
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
-      <CssBaseline />
       <Box
         sx={{
           bgcolor: 'background.default',
@@ -101,6 +126,7 @@ function App() {
           padding: '1rem',
         }}
       >
+        <CssBaseline />
         <Provider store={store}>
           <RouterProvider router={router} />
         </Provider>
