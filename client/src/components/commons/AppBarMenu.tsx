@@ -63,7 +63,7 @@ export const AppBarMenu = () => {
           </Button>
 
           {!isAuth && (
-            <Button color="inherit" component={Link} to="/login">
+            <Button color="inherit" component={Link} to="/iniciar-sesion">
               Iniciar Sesión
             </Button>
           )}
@@ -103,7 +103,7 @@ export const AppBarMenu = () => {
                 <MenuItem
                   onClick={handleMenuClose}
                   component={Link}
-                  to="/cerrar-session"
+                  to="/cerrar-sesion"
                 >
                   <ListItemIcon>
                     <Logout fontSize="small" />

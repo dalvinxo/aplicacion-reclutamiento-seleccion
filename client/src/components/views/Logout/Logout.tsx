@@ -17,27 +17,27 @@ export const Logout = () => {
 
   return (
     <>
-      <Box
+      {/* <Box
         display="flex"
         justifyContent="center"
         alignItems="center"
         height="80vh"
-      >
-        <Stack gap={3}>
-          <Typography variant="h6" display={'block'} gutterBottom>
-            ¿Estas seguro que quieres cerrar sesión?
-          </Typography>
-          <Button
-            onClick={onclickLogout}
-            variant="outlined"
-            color="error"
-            startIcon={<LogoutRounded />}
-          >
-            Cerrar Sesión
-          </Button>
-          {isLoading && <SpinnerCircularProgress />}
-        </Stack>
-      </Box>
+      > */}
+      <Stack gap={3}>
+        <Typography variant="h6" display={'block'} gutterBottom>
+          ¿Estas seguro que quieres cerrar sesión?
+        </Typography>
+        <Button
+          onClick={onclickLogout}
+          variant="outlined"
+          color="error"
+          startIcon={<LogoutRounded />}
+        >
+          Cerrar Sesión
+        </Button>
+        {isLoading && <SpinnerCircularProgress />}
+      </Stack>
+      {/* </Box> */}
     </>
   );
 };
