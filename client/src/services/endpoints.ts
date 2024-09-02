@@ -4,4 +4,7 @@ export const endpoints = {
     logout: 'auth/logout',
     user: 'auth/user',
   },
+  puestos: {
+    getAll: 'puestos',
+  },
 };

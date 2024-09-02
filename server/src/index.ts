@@ -40,11 +40,10 @@ app.get('/ping', (_req, res) => {
 })
 
 app.use('/api/auth', authRouter)
-
-app.use(authorize([EnumRoles.ADMIN]))
-app.use('/api/usuarios', usuariosRouter)
-app.use(authorize([EnumRoles.USER, EnumRoles.ADMIN]))
 app.use('/api/candidatos', candidatosRouter)
+app.use('/api/puestos', puestosRouter)
+
+app.use(authorize([EnumRoles.USER, EnumRoles.ADMIN]))
 app.use('/api/personas', personasRouter)
 app.use('/api/capacitaciones', capacitacionesRouter)
 app.use('/api/personasIdiomas', personasIdiomasRouter)
@@ -53,13 +52,15 @@ app.use('/api/personasCompetencias', personasCompetenciasRouter)
 app.use('/api/empleados', empleadosRouter)
 app.use('/api/roles', rolesRouter)
 app.use('/api/idiomas', idiomasRouter)
-app.use('/api/puestos', puestosRouter)
 app.use('/api/departamentos', departamentosRouter)
 app.use('/api/roles', rolesRouter)
 app.use('/api/competencias', competenciasRouter)
 app.use('/api/puestosIdiomas', puestosIdiomasRouter)
 app.use('/api/puestosCompetencias', puestosCompetenciasRouter)
 app.use('/api/estadosCandidatos', estadosCandidatos)
+
+app.use(authorize([EnumRoles.ADMIN]))
+app.use('/api/usuarios', usuariosRouter)
 
 
 

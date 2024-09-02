@@ -15,6 +15,7 @@ import useAlert from '../../../hook/useAlert';
 import { useAppDispatch } from '../../../store/hook';
 import { setUser } from '../../../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
+import { enqueueSnackbar } from 'notistack';
 
 interface ILoginForm {
   username: string;
@@ -45,6 +46,7 @@ const LoginForm = () => {
       .unwrap()
       .then((response) => {
         dispatch(setUser(response));
+        enqueueSnackbar(`Bienvenido ${response.user}`, { variant: 'success' });
         navigate('/', { replace: true });
       })
       .catch((error: IException) => {

@@ -1,42 +1,93 @@
 import express from "express";
 
 import { prisma } from "../libs/prisma";
-import { EnumHttpCode } from "../types";
+import { EnumHttpCode, EnumRoles } from "../types";
+import { authorize } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-router.get("/", async (_req, res, next) => {
+router.get("/", async (req, res, next) => {
+  const { page, limit = 10 } = req.query;
+
+  const pages = Number(page || 1);
+  const limits = Number(limit || 10);
+
+  const skip = (pages - 1) * limits;
+  const take = limits;
+
   try {
-    const puestos = await prisma.puesto.findMany();
+    const puestos = await prisma.puesto.findMany({
+      skip: skip,
+      take: take,
+      where: {
+        estado: true,
+      },
+      orderBy: {
+        id_puesto: "desc",
+      },
+      include: {
+        Departamento: {
+          select: {
+            id_departamento: true,
+            nombre: true,
+          },
+        },
+      },
+    });
+
+    const totalPuestos = await prisma.puesto.count({
+      where: {
+        estado: true,
+      },
+    });
+
+    const totalPages = Math.ceil(totalPuestos / take);
+
+    res.json({
+      page: pages,
+      limit: limits,
+      totalPages: totalPages,
+      totalPuestos: totalPuestos,
+      puestos: puestos,
+    });
+
     res.json(puestos);
   } catch (error) {
     next(error);
   }
 });
 
-router.post("/", async (req, res, next) => {
-  try {
-    const puesto = await prisma.puesto.create({
-      data: req.body,
-    });
+router.post(
+  "/",
+  authorize([EnumRoles.USER, EnumRoles.ADMIN]),
+  async (req, res, next) => {
+    try {
+      const puesto = await prisma.puesto.create({
+        data: req.body,
+      });
 
-    res.status(EnumHttpCode.CREATED).json(puesto);
-  } catch (error) {
-    next(error);
+      res.status(EnumHttpCode.CREATED).json(puesto);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
-router.post("/multiples", async (req, res, next) => {
-  try {
-    const puestos = await prisma.puesto.createMany({
-      data: req.body,
-    });
+router.post(
+  "/multiples",
+  authorize([EnumRoles.USER, EnumRoles.ADMIN]),
+  async (req, res, next) => {
+    try {
+      const puestos = await prisma.puesto.createMany({
+        data: req.body,
+      });
 
-    res.status(EnumHttpCode.CREATED).json(puestos);
-  } catch (error) {
-    next(error);
+      res.status(EnumHttpCode.CREATED).json(puestos);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.get("/:id", async (req, res, next) => {
   try {
