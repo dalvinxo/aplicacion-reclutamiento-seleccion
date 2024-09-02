@@ -12,6 +12,9 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { useLoginMutation } from '../../../features/auth/authApiSlice';
 import { SpinnerCircularProgress } from '../../commons/SpinnerCircularProgress';
 import useAlert from '../../../hook/useAlert';
+import { useAppDispatch } from '../../../store/hook';
+import { setUser } from '../../../features/auth/authSlice';
+import { useNavigate } from 'react-router-dom';
 
 interface ILoginForm {
   username: string;
@@ -19,8 +22,12 @@ interface ILoginForm {
 }
 
 const LoginForm = () => {
-  const [login, { isLoading }] = useLoginMutation();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+
   const { AlertComponent, setError } = useAlert();
+
+  const [login, { isLoading }] = useLoginMutation();
 
   const {
     register,
@@ -34,12 +41,11 @@ const LoginForm = () => {
   };
 
   const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
-    // Lógica para iniciar sesión
-
     await login({ ...data })
       .unwrap()
       .then((response) => {
-        console.log(response);
+        dispatch(setUser(response));
+        navigate('/', { replace: true });
       })
       .catch((error: IException) => {
         setError(error.data.message);

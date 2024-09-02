@@ -1,8 +1,18 @@
 import { Box, Card, CardContent, Divider, Typography } from '@mui/material';
 import LoginForm from './LoginForm';
 import LoginIcon from '@mui/icons-material/Login';
+import { useAppSelector } from '../../../store/hook';
+import { Navigate, useLocation } from 'react-router-dom';
+import { selectCurrentUser } from '../../../features/auth/authSlice';
 
 export const Login = () => {
+  const user = useAppSelector(selectCurrentUser);
+  const location = useLocation();
+
+  if (!!user) {
+    return <Navigate to="/" state={{ from: location }} replace={true} />;
+  }
+
   return (
     <Box
       display="flex"

@@ -8,6 +8,11 @@ import { Login } from './components/views/Login/Login';
 import { Home } from './components/views/Home/Home';
 import { Provider } from 'react-redux';
 import { store } from './store';
+import { Logout } from './components/views/Logout/Logout';
+import { Maintenance } from './components/views/Maintenance/Maintenance';
+import { Profile } from './components/views/Profile/Profile';
+import { LayoutProtected } from './components/layouts/LayoutProtected';
+import { LayoutAuth } from './components/layouts/LayoutAuth';
 
 const router = createBrowserRouter([
   {
@@ -19,14 +24,30 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: 'login',
-        element: <Login />,
+        element: <LayoutProtected />,
+        children: [{ path: 'login', element: <Login /> }],
+      },
+      {
+        element: <LayoutAuth />,
+        children: [
+          {
+            path: 'cerrar-session',
+            element: <Logout />,
+          },
+          {
+            path: 'mantenimiento',
+            element: <Maintenance />,
+          },
+          {
+            path: 'perfil',
+            element: <Profile />,
+          },
+        ],
       },
     ],
   },
 ]);
 
-// Definición del tema claro
 const lightTheme = createTheme({
   palette: {
     mode: 'light',
@@ -69,7 +90,7 @@ const darkTheme = createTheme({
 
 function App() {
   const { theme } = useThemeContext();
-  console.log(theme);
+
   return (
     <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
       <CssBaseline />

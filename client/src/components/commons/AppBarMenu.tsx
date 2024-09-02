@@ -7,6 +7,9 @@ import {
   Menu,
   MenuItem,
   Box,
+  ListItemIcon,
+  Divider,
+  Avatar,
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 
@@ -15,11 +18,17 @@ import { useThemeContext } from '../../context/ThemeContext';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import ThemeIcon from '@mui/icons-material/Brightness4';
+import { useAppSelector } from '../../store/hook';
+import { selectCurrentUser } from '../../features/auth/authSlice';
+import { Logout, ConstructionRounded } from '@mui/icons-material';
 
 export const AppBarMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const { toggleTheme } = useThemeContext();
+
+  const user = useAppSelector(selectCurrentUser);
+  const isAuth = !!user;
 
   const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -53,33 +62,57 @@ export const AppBarMenu = () => {
             Inicio
           </Button>
 
-          <Button color="inherit" component={Link} to="/login">
-            Iniciar Sesión
-          </Button>
+          {!isAuth && (
+            <Button color="inherit" component={Link} to="/login">
+              Iniciar Sesión
+            </Button>
+          )}
 
           <IconButton color="inherit" onClick={toggleTheme}>
             <ThemeIcon />
           </IconButton>
 
-          <IconButton color="inherit" onClick={handleMenuClick}>
-            <MenuIcon />
-          </IconButton>
-
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-          >
-            <MenuItem onClick={handleMenuClose} component={Link} to="/profile">
-              Profile
-            </MenuItem>
-            <MenuItem onClick={handleMenuClose} component={Link} to="/settings">
-              Settings
-            </MenuItem>
-            <MenuItem onClick={handleMenuClose} component={Link} to="/logout">
-              Logout
-            </MenuItem>
-          </Menu>
+          {isAuth && (
+            <>
+              <IconButton color="inherit" onClick={handleMenuClick}>
+                <MenuIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem
+                  onClick={handleMenuClose}
+                  component={Link}
+                  to="/perfil"
+                >
+                  <Avatar /> &nbsp;&nbsp; Perfil
+                </MenuItem>
+                <Divider />
+                <MenuItem
+                  onClick={handleMenuClose}
+                  component={Link}
+                  to="/mantenimiento"
+                >
+                  <ListItemIcon>
+                    <ConstructionRounded fontSize="small" />
+                  </ListItemIcon>
+                  Mantenimiento
+                </MenuItem>
+                <MenuItem
+                  onClick={handleMenuClose}
+                  component={Link}
+                  to="/cerrar-session"
+                >
+                  <ListItemIcon>
+                    <Logout fontSize="small" />
+                  </ListItemIcon>
+                  Cerrar Sesión
+                </MenuItem>
+              </Menu>
+            </>
+          )}
         </Toolbar>
       </AppBar>
     </Box>
