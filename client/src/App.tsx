@@ -20,6 +20,8 @@ import { LayoutAuth } from './components/layouts/LayoutAuth';
 import { Position } from './components/views/Position/Position';
 import { PositionDetails } from './components/views/Position/PositionDetails';
 import { CreateCandidate } from './components/views/Position/CreateCandidate';
+import { Competencias } from './components/views/Maintenance/Competencias/Competencias';
+import { Idiomas } from './components/views/Maintenance/Idiomas/Idiomas';
 
 const router = createBrowserRouter([
   {
@@ -63,6 +65,20 @@ const router = createBrowserRouter([
           {
             path: 'mantenimiento',
             element: <Maintenance />,
+            children: [
+              {
+                index: true,
+                element: <h2>Seleccionar una opcion</h2>,
+              },
+              {
+                path: 'competencias',
+                element: <Competencias />,
+              },
+              {
+                path: 'idiomas',
+                element: <Idiomas />,
+              },
+            ],
           },
           {
             path: 'perfil',
