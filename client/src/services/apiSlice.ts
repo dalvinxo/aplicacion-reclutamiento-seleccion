@@ -26,7 +26,6 @@ const baseQueryWithReauth: TypeBaseQuery = async (args, api, extraOptions) => {
     }
   } catch (error) {
     console.error(error);
-  } finally {
     api.dispatch(logOut({}));
   }
 

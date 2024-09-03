@@ -3,6 +3,7 @@ import morgan from 'morgan'
 import cookieParser from 'cookie-parser'
 
 import authRouter from './routes/auth.routes'
+import formRouter from './routes/forms.routes'
 import usuariosRouter from './routes/usuarios.routes'
 
 import empleadosRouter from './routes/empleados.routes'
@@ -40,6 +41,7 @@ app.get('/ping', (_req, res) => {
 })
 
 app.use('/api/auth', authRouter)
+app.use('/api/form', formRouter)
 app.use('/api/candidatos', candidatosRouter)
 app.use('/api/puestos', puestosRouter)
 

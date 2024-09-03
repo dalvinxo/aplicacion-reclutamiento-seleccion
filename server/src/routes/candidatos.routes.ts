@@ -26,64 +26,6 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-router.post("/detalles", async (req, res, next) => {
-  try {
-    const { puesto_aspirado_id, salario_aspirado, recomendado_por, persona } =
-      req.body;
-
-    const {
-      cedula,
-      nombre,
-      competencias = [],
-      capacitaciones = [],
-      experienciaLaboral = [],
-      idiomas = [],
-    } = persona as ICreatePerson;
-
-    const personaCandidato = await prisma.persona.create({
-      data: {
-        cedula: cedula,
-        nombre: nombre,
-        PersonaCompetencia: {
-          create: competencias.map((competencia) => ({
-            competencia_id: competencia.competencia_id,
-          })),
-        },
-        PersonaIdioma: {
-          create: idiomas.map((idioma) => ({
-            idioma_id: idioma.idioma_id,
-          })),
-        },
-        ExperienciaLaboral: {
-          create: experienciaLaboral,
-        },
-        Capacitacion: {
-          create: capacitaciones,
-        },
-        Candidato: {
-          create: {
-            puesto_aspirado_id: puesto_aspirado_id,
-            salario_aspirado: salario_aspirado,
-            recomendado_por: recomendado_por,
-            estado_candidato_id: EnumStatusCandidato.POSTULADO,
-          },
-        },
-      },
-      include: {
-        Capacitacion: true,
-        ExperienciaLaboral: true,
-        PersonaCompetencia: true,
-        PersonaIdioma: true,
-        Candidato: true,
-      },
-    });
-
-    res.status(EnumHttpCode.CREATED).json(personaCandidato);
-  } catch (error) {
-    next(error);
-  }
-});
-
 router.post("/multiples", async (req, res, next) => {
   try {
     const candidatos = await prisma.candidato.createMany({
@@ -140,6 +82,64 @@ router.patch("/:id", async (req, res, next) => {
       data: req.body,
     });
     res.json(candidato);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/detalles", async (req, res, next) => {
+  try {
+    const { puesto_aspirado_id, salario_aspirado, recomendado_por, persona } =
+      req.body;
+
+    const {
+      cedula,
+      nombre,
+      competencias = [],
+      capacitaciones = [],
+      experienciaLaboral = [],
+      idiomas = [],
+    } = persona as ICreatePerson;
+
+    const personaCandidato = await prisma.persona.create({
+      data: {
+        cedula: cedula,
+        nombre: nombre,
+        PersonaCompetencia: {
+          create: competencias.map((competencia) => ({
+            competencia_id: competencia.competencia_id,
+          })),
+        },
+        PersonaIdioma: {
+          create: idiomas.map((idioma) => ({
+            idioma_id: idioma.idioma_id,
+          })),
+        },
+        ExperienciaLaboral: {
+          create: experienciaLaboral,
+        },
+        Capacitacion: {
+          create: capacitaciones,
+        },
+        Candidato: {
+          create: {
+            puesto_aspirado_id: puesto_aspirado_id,
+            salario_aspirado: salario_aspirado,
+            recomendado_por: recomendado_por,
+            estado_candidato_id: EnumStatusCandidato.POSTULADO,
+          },
+        },
+      },
+      include: {
+        Capacitacion: true,
+        ExperienciaLaboral: true,
+        PersonaCompetencia: true,
+        PersonaIdioma: true,
+        Candidato: true,
+      },
+    });
+
+    res.status(EnumHttpCode.CREATED).json(personaCandidato);
   } catch (error) {
     next(error);
   }

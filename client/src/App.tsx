@@ -118,20 +118,20 @@ function App() {
   const { theme } = useThemeContext();
 
   return (
-    <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
-      <Box
-        sx={{
-          bgcolor: 'background.default',
-          minHeight: '100vh',
-          padding: '1rem',
-        }}
-      >
-        <CssBaseline />
-        <Provider store={store}>
+    <Provider store={store}>
+      <ThemeProvider theme={theme == 'dark' ? darkTheme : lightTheme}>
+        <Box
+          sx={{
+            bgcolor: 'background.default',
+            minHeight: '100vh',
+            padding: '1rem',
+          }}
+        >
+          <CssBaseline />
           <RouterProvider router={router} />
-        </Provider>
-      </Box>
-    </ThemeProvider>
+        </Box>
+      </ThemeProvider>
+    </Provider>
   );
 }
 

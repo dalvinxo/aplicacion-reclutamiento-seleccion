@@ -10,4 +10,7 @@ export const endpoints = {
     getOne: (id: number) => `puestos/${id}`,
     getOneDetails: (id: number) => `puestos/${id}/competenciasYIdiomas`,
   },
+  form: {
+    getFormCrearCandidato: `form/crear-candidatos`,
+  },
 };

@@ -1,7 +1,6 @@
 import Grid from '@mui/material/Grid2';
 import { NivelRiesgo } from '../../../features/puestos/puestosTypes';
 import {
-  Box,
   Button,
   Chip,
   List,

@@ -8,27 +8,26 @@ interface IBreadcrumbsCommons {
   title: string;
 }
 
-export const BreadcrumbsCommons = () => {
-  const location = useLocation();
-  const pathnames = location.pathname.split('/').filter((x) => x);
-
-  console.log(location, pathnames);
+export const BreadcrumbsCommons = (props: IBreadcrumbsCommons) => {
+  const { linksItems, title } = props;
 
   return (
     <>
       <div role="presentation">
-        <Breadcrumbs aria-label="breadcrumb" sx={{ margin: '1.3rem' }}>
-          <Link underline="hover" color="inherit" component={LinkRouter} to="/">
-            MUI
-          </Link>
-          <Link
-            underline="hover"
-            color="inherit"
-            href="/material-ui/getting-started/installation/"
-          >
-            Core
-          </Link>
-          <Typography sx={{ color: 'text.primary' }}>Breadcrumbs</Typography>
+        <Breadcrumbs aria-label="breadcrumb">
+          {Object.entries(linksItems).map(([key, name], index) => (
+            <Link
+              underline="hover"
+              color="inherit"
+              component={LinkRouter}
+              to={key}
+              key={key + index}
+            >
+              {name}
+            </Link>
+          ))}
+
+          <Typography sx={{ color: 'text.primary' }}>{title}</Typography>
         </Breadcrumbs>
       </div>
     </>
