@@ -27,13 +27,13 @@ router.get("/", async (req, res, next) => {
     });
 
     const totalCompetencias = await prisma.competencia.count();
-    const total = Math.ceil(totalCompetencias / take);
+    const totalPages = Math.ceil(totalCompetencias / take);
 
     res.json({
       page: pages,
       limit: limits,
-      totalPages: totalCompetencias,
-      total,
+      totalPages: totalPages,
+      total: totalCompetencias,
       competencias,
     });
   } catch (error) {

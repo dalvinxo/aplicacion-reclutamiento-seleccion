@@ -22,6 +22,9 @@ import { PositionDetails } from './components/views/Position/PositionDetails';
 import { CreateCandidate } from './components/views/Position/CreateCandidate';
 import { Competencias } from './components/views/Maintenance/Competencias/Competencias';
 import { Idiomas } from './components/views/Maintenance/Idiomas/Idiomas';
+import { NuevaCompetencia } from './components/views/Maintenance/Competencias/NuevaCompetencia';
+import { EditarCompetencia } from './components/views/Maintenance/Competencias/EditarCompetencia';
+import { ListadoCompetencia } from './components/views/Maintenance/Competencias/ListadoCompetencia';
 
 const router = createBrowserRouter([
   {
@@ -73,6 +76,20 @@ const router = createBrowserRouter([
               {
                 path: 'competencias',
                 element: <Competencias />,
+                children: [
+                  {
+                    index: true,
+                    element: <ListadoCompetencia />,
+                  },
+                  {
+                    path: 'crear-competencia',
+                    element: <NuevaCompetencia />,
+                  },
+                  {
+                    path: 'editar-competencia/:id',
+                    element: <EditarCompetencia />,
+                  },
+                ],
               },
               {
                 path: 'idiomas',
