@@ -1,9 +1,5 @@
-export interface Puestos {
-  limit: number;
-  page: number;
+export interface Puestos extends IPagination {
   puestos: Puesto[];
-  totalPages: number;
-  totalPuestos: number;
 }
 
 export interface Puesto {

@@ -52,7 +52,7 @@ router.get("/", async (req, res, next) => {
       page: pages,
       limit: limits,
       totalPages: totalPages,
-      totalPuestos: totalPuestos,
+      total: totalPuestos,
       puestos: puestosPages,
     });
   } catch (error) {

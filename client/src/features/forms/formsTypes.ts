@@ -1,14 +1,14 @@
 export interface FormCrearCandidato {
-  competencias: Competencia[];
-  idiomas: Idioma[];
+  competencias: CompetenciaForm[];
+  idiomas: IdiomaForm[];
 }
 
-export interface Competencia {
+export interface CompetenciaForm {
   descripcion: string;
   id_competencia: number;
 }
 
-export interface Idioma {
+export interface IdiomaForm {
   id_idioma: number;
   nombre: string;
 }

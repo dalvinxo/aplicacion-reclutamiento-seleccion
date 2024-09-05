@@ -5,10 +5,37 @@ import { EnumHttpCode } from "../types";
 
 const router = express.Router();
 
-router.get("/", async (_req, res, next) => {
+router.get("/", async (req, res, next) => {
+  const { page, limit } = req.query;
+
+  const pages = Number(page || 1);
+  const limits = Number(limit || 10);
+
+  const skip = (pages - 1) * limits;
+  const take = limits;
+
   try {
-    const competencias = await prisma.competencia.findMany();
-    res.json(competencias);
+    const competencias = await prisma.competencia.findMany({
+      skip: skip,
+      take: take,
+      where: {
+        estado: true,
+      },
+      orderBy: {
+        id_competencia: "desc",
+      },
+    });
+
+    const totalCompetencias = await prisma.competencia.count();
+    const total = Math.ceil(totalCompetencias / take);
+
+    res.json({
+      page: pages,
+      limit: limits,
+      totalPages: totalCompetencias,
+      total,
+      competencias,
+    });
   } catch (error) {
     next(error);
   }
@@ -43,10 +70,6 @@ router.get("/:id", async (req, res, next) => {
     const competencia = await prisma.competencia.findUnique({
       where: {
         id_competencia: Number(req.params.id),
-      },
-      include: {
-        PersonaCompetencia: true,
-        PuestoCompetencia: true,
       },
     });
 

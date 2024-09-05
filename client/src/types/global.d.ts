@@ -23,4 +23,21 @@ declare global {
     defaultVariant?: 'filled' | 'outlined' | 'standard';
     defaultSeverity?: 'error' | 'warning' | 'info' | 'success';
   }
+
+  export interface IPagination {
+    limit: number;
+    page: number;
+    totalPages: number;
+    total: number;
+  }
+
+  export interface IColumnBasic<T> {
+    id: T | 'action';
+    headerName: string;
+    width?: number;
+    minWidth?: number;
+    maxWidth?: number;
+    align?: 'left' | 'center' | 'right' | 'justify' | 'inherit' | undefined;
+    formatBool?: (value: boolean) => string;
+  }
 }
