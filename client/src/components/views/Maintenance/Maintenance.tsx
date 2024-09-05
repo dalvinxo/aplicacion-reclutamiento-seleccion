@@ -7,7 +7,7 @@ export const Maintenance = () => {
     <>
       <Box sx={{ flexGrow: 1, padding: '1.5rem' }}>
         <Grid2 container spacing={{ xs: 2, md: 3 }}>
-          <Grid2 size="auto">
+          <Grid2 size="auto" paddingTop={3}>
             <Sidebar />
           </Grid2>
           <Grid2 size="grow">

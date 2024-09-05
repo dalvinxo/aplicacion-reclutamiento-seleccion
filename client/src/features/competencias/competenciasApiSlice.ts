@@ -13,8 +13,19 @@ export const competenciasApiSlice = apiSlice.injectEndpoints({
     getOneCompetencia: builder.query<Competencia, number>({
       query: (id) => endpoints.puestos.getOneDetails(id),
     }),
+    createCompetencia: builder.mutation<Competencia, { descripcion: string }>({
+      query: (data) => ({
+        url: endpoints.competencias.create,
+        method: 'POST',
+        body: { ...data },
+      }),
+    }),
   }),
 });
 
-export const { useGetAllCompetenciasQuery, useGetOneCompetenciaQuery } =
-  competenciasApiSlice;
+export const {
+  useGetAllCompetenciasQuery,
+  useGetOneCompetenciaQuery,
+  useLazyGetOneCompetenciaQuery,
+  useCreateCompetenciaMutation,
+} = competenciasApiSlice;
