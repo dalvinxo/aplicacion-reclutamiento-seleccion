@@ -8,6 +8,43 @@ import { NODE_ENV, SECRET_JWT_KEY } from "../utils/config";
 
 const router = express.Router();
 
+router.get("/crear-puestos", async (_req, res) => {
+  try {
+    const idiomas = await prisma.idioma.findMany({
+      where: {
+        estado: true,
+      },
+      select: {
+        id_idioma: true,
+        nombre: true,
+      },
+    });
+
+    const competencias = await prisma.competencia.findMany({
+      where: {
+        estado: true,
+      },
+      select: {
+        id_competencia: true,
+        descripcion: true,
+      },
+    });
+
+    const departamentos = await prisma.departamento.findMany({
+      select: {
+        id_departamento: true,
+        nombre: true,
+      },
+    });
+
+    res.json({ idiomas, competencias, departamentos });
+  } catch (error) {
+    res
+      .status(EnumHttpCode.INTERNAL_SERVER_ERROR)
+      .json({ message: "Ha ocurrido un error en el servidor" });
+  }
+});
+
 router.get("/crear-candidatos", async (_req, res) => {
   try {
     const idiomas = await prisma.idioma.findMany({

@@ -34,5 +34,6 @@ export const endpoints = {
   },
   form: {
     getFormCrearCandidato: `form/crear-candidatos`,
+    getFormCrearPuesto: `form/crear-puestos`,
   },
 };

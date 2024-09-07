@@ -1,155 +1,186 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { Box, Stack, TextField } from '@mui/material';
+import { Controller, Resolver, SubmitHandler, useForm } from 'react-hook-form';
+import {
+  Box,
+  FormHelperText,
+  InputLabel,
+  MenuItem,
+  Select,
+  Stack,
+  TextField,
+} from '@mui/material';
+import Grid from '@mui/material/Grid2';
+
 import useAlert from '../../../../hook/useAlert';
-import { useEffect } from 'react';
 
 import SaveIcon from '@mui/icons-material/Save';
 
 import LoadingButton from '@mui/lab/LoadingButton';
-import { enqueueSnackbar } from 'notistack';
-import {
-  useCreateIdiomaMutation,
-  useLazyGetOneIdiomaQuery,
-  useUpdateIdiomaMutation,
-} from '../../../../features/idiomas/idiomasApiSlice';
 
-interface IFormularioIdioma {
-  nombre: string;
-}
+import * as yup from 'yup';
+
+import { DevTool } from '@hookform/devtools';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useGetFormCrearPuestosQuery } from '../../../../features/forms/formsApiSlice';
+import { SpinnerCircularProgress } from '../../../commons/SpinnerCircularProgress';
+
+const formPuestoSchema = yup.object().shape({
+  nombre: yup
+    .string()
+    .required('El nombre es requerido.')
+    .min(5, 'El nombre debe tener al menos 5 caracteres.')
+    .max(60, 'El nombre no puede exceder los 60 caracteres.'),
+  descripcion: yup.string().required('La descripción es requerida.'),
+  departamento_id: yup
+    .number()
+    .required('El departamento es requerido')
+    .min(1, 'Selecciona un departamento válido')
+    .typeError('Selecciona un departamento válido'),
+  nivel_minimo_salario: yup
+    .number()
+    .positive('El salario mínimo debe ser mayor a 0.')
+    .required('El salario mínimo es requerido.'),
+  nivel_maximo_salario: yup
+    .number()
+    .positive('El salario máximo debe ser mayor a 0.')
+    .required('El salario máximo es requerido.'),
+  competencias: yup
+    .array()
+    .of(yup.number())
+    .min(1, 'Debe seleccionar al menos una competencia.'),
+  idiomas: yup
+    .array()
+    .of(yup.number())
+    .length(1, 'Debe tener al menos un idioma seleccionado')
+    .min(1, 'Debe seleccionar al menos un idioma.'),
+});
+
+interface IFormularioPuesto extends yup.InferType<typeof formPuestoSchema> {}
 
 export const FormularioPuesto = () => {
   const { id } = useParams();
 
   const navigate = useNavigate();
 
+  const { data, isLoading } = useGetFormCrearPuestosQuery();
+
   const { AlertComponent, setError } = useAlert();
 
-  const [crearIdioma, { isLoading: isLoadingCreate }] =
-    useCreateIdiomaMutation();
-  const [actualizarIdioma, { isLoading: isLoadingUpdate }] =
-    useUpdateIdiomaMutation();
-  const [consultarIdioma, { isFetching }] = useLazyGetOneIdiomaQuery();
-
   const {
-    reset,
+    watch,
+    control,
     register,
     handleSubmit,
-    setValue,
-    watch,
     formState: { errors },
-  } = useForm<IFormularioIdioma>();
+  } = useForm<IFormularioPuesto>({
+    resolver: yupResolver(formPuestoSchema),
+  });
 
-  const updateIdioma = async (id: string, body: IFormularioIdioma) => {
-    const idIdioma = Number(id);
-
-    if (isNaN(idIdioma)) {
-      setError('El id debe ser un número');
-      return;
-    }
-
-    await actualizarIdioma({
-      id: idIdioma,
-      nombre: body.nombre,
-    })
-      .unwrap()
-      .then((_response) => {
-        enqueueSnackbar('Idioma actualizada correctamente', {
-          variant: 'success',
-        });
-        navigate('/mantenimiento/idiomas', { replace: true });
-      })
-      .catch((error: IException) => {
-        setError(error.data.message);
-      });
+  const onSubmit: SubmitHandler<IFormularioPuesto> = async (data) => {
+    console.log(data);
   };
-
-  const createIdioma = async (body: IFormularioIdioma) => {
-    await crearIdioma({
-      nombre: body.nombre,
-    })
-      .unwrap()
-      .then((_response) => {
-        enqueueSnackbar(`Idioma creada correctamente`, {
-          variant: 'success',
-        });
-        navigate('/mantenimiento/idiomas', { replace: true });
-      })
-      .catch((error: IException) => {
-        setError(error.data.message);
-      });
-  };
-
-  const onSubmit: SubmitHandler<IFormularioIdioma> = async (data) => {
-    if (id) {
-      await updateIdioma(id, data);
-      return;
-    }
-
-    await createIdioma(data);
-  };
-
-  useEffect(() => {
-    if (id) {
-      consultarIdioma(parseInt(id))
-        .unwrap()
-        .then((data) => {
-          console.log(data);
-          setValue('nombre', data.nombre);
-        });
-    }
-  }, [id, reset]);
 
   return (
     <>
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ padding: '3rem 0 1rem 0', width: '22rem' }}
+        sx={{ padding: '3rem 0 1rem 0' }}
       >
-        <Stack spacing={2}>
-          <TextField
-            label="idioma"
-            aria-autocomplete="none"
-            slotProps={{
-              inputLabel: { shrink: !!watch('nombre') },
-            }}
-            {...register('nombre', {
-              required: 'Por favor, ingrese el idioma',
-              minLength: {
-                value: 5,
-                message: 'El idioma debe tener al menos 5 caracteres',
-              },
-            })}
-            error={!!errors.nombre}
-            helperText={errors.nombre?.message}
-            margin="normal"
-          />
+        <Grid container spacing={2}>
+          <Grid size={6}>
+            <Controller
+              name="nombre"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  label="Nombre del puesto"
+                  fullWidth
+                  {...field}
+                  error={!!errors.nombre}
+                  helperText={errors.nombre?.message}
+                />
+              )}
+            />
+          </Grid>
 
-          <LoadingButton
-            color="success"
-            loading={isLoadingCreate || isLoadingUpdate || isFetching}
-            loadingPosition="start"
-            type="submit"
-            startIcon={<SaveIcon />}
-            variant="contained"
-          >
-            Guardar
-          </LoadingButton>
-          {/* <Button
-            type="submit"
-            variant="contained"
-            color="success"
-            disabled={isLoading}
-          >
-            Guardar
-          </Button> */}
+          <Grid size={6}>
+            <Controller
+              name="descripcion"
+              control={control}
+              defaultValue=""
+              render={({ field }) => (
+                <TextField
+                  label="Descripción del puesto"
+                  fullWidth
+                  {...field}
+                  error={!!errors.descripcion}
+                  helperText={errors.descripcion?.message}
+                />
+              )}
+            />
+          </Grid>
 
-          {/* {isLoadingCreate || is && <SpinnerCircularProgress />} */}
-          <AlertComponent />
-        </Stack>
+          <Grid size={6}>
+            <Controller
+              name="departamento_id"
+              control={control}
+              defaultValue={0}
+              render={({ field }) => (
+                <>
+                  <Select
+                    fullWidth
+                    labelId="select-departamento-label"
+                    id="select-departamento"
+                    error={!!errors.departamento_id}
+                    displayEmpty
+                    {...field}
+                  >
+                    <MenuItem value={0}>
+                      <em>Seleccione el departamento del puesto</em>
+                    </MenuItem>
+                    {data ? (
+                      data.departamentos.map((departamento) => (
+                        <MenuItem
+                          key={departamento.id_departamento}
+                          value={departamento.id_departamento}
+                        >
+                          {departamento.nombre}
+                        </MenuItem>
+                      ))
+                    ) : (
+                      <SpinnerCircularProgress />
+                    )}
+                  </Select>
+                  <FormHelperText error={!!errors.departamento_id}>
+                    {errors.departamento_id?.message}
+                  </FormHelperText>
+                </>
+              )}
+            />
+          </Grid>
+
+          <Grid size={12}>
+            <LoadingButton
+              color="success"
+              loadingPosition="start"
+              loading={isLoading}
+              type="submit"
+              startIcon={<SaveIcon />}
+              variant="contained"
+            >
+              Guardar
+            </LoadingButton>
+          </Grid>
+
+          <Grid size={12}>
+            <AlertComponent />
+          </Grid>
+        </Grid>
       </Box>
+      <DevTool control={control} />
     </>
   );
 };
