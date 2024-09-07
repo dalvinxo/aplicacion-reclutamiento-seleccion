@@ -1,8 +1,12 @@
 import { useState } from 'react';
-import { useGetAllCompetenciasQuery } from '../../../../features/competencias/competenciasApiSlice';
+import {
+  useGetAllCompetenciasQuery,
+  useUpdateCompetenciaMutation,
+} from '../../../../features/competencias/competenciasApiSlice';
 import {
   Box,
   Button,
+  Chip,
   IconButton,
   Pagination,
   Paper,
@@ -15,22 +19,27 @@ import {
 } from '@mui/material';
 
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import ToggleOnIcon from '@mui/icons-material/ToggleOn';
+import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 
 import { SkeletonLoading } from '../../../commons/SkeletonLoading';
 import { Competencia } from '../../../../features/competencias/competenciasTypes';
 import { Link } from 'react-router-dom';
+import { enqueueSnackbar } from 'notistack';
 
 export const ListadoCompetencia = () => {
   const [page, setPage] = useState<number>(1);
 
-  const { data, isLoading } = useGetAllCompetenciasQuery(
+  const [actualizarCompetencia] = useUpdateCompetenciaMutation();
+
+  const { data, isLoading, refetch } = useGetAllCompetenciasQuery(
     {
       pages: page,
       limit: 5,
     },
     {
       refetchOnMountOrArgChange: true,
+      refetchOnReconnect: true,
     }
   );
 
@@ -60,8 +69,25 @@ export const ListadoCompetencia = () => {
     setPage(value);
   };
 
-  const handleDelete = () => {
-    console.log('eliminando');
+  const handleDelete = async (id: number, estado: boolean) => {
+    await actualizarCompetencia({ id, estado })
+      .unwrap()
+      .then((response) => {
+        enqueueSnackbar(
+          `Competencia ${id} ${estado ? 'habilitada' : 'deshabilitada'}  correctamente`,
+          {
+            variant: 'success',
+          }
+        );
+      })
+      .catch((error: IException) => {
+        enqueueSnackbar(error.data.message, {
+          variant: 'success',
+        });
+      })
+      .finally(() => {
+        refetch();
+      });
   };
 
   return (
@@ -127,11 +153,20 @@ export const ListadoCompetencia = () => {
                                 </IconButton>
 
                                 <IconButton
-                                  onClick={handleDelete}
+                                  onClick={() =>
+                                    handleDelete(
+                                      competencia.id_competencia,
+                                      !competencia.estado
+                                    )
+                                  }
                                   aria-label="delete"
                                   size="small"
                                 >
-                                  <DeleteIcon />
+                                  {competencia.estado ? (
+                                    <ToggleOnIcon color="success" />
+                                  ) : (
+                                    <ToggleOffIcon color="error" />
+                                  )}
                                 </IconButton>
                               </TableCell>
                             );
@@ -141,9 +176,15 @@ export const ListadoCompetencia = () => {
 
                           return (
                             <TableCell key={column.id} align={column.align}>
-                              {column.formatBool && typeof value === 'boolean'
-                                ? column.formatBool(value)
-                                : value}
+                              {column.formatBool &&
+                              typeof value === 'boolean' ? (
+                                <Chip
+                                  label={column.formatBool(value)}
+                                  color={value ? 'primary' : 'secondary'}
+                                />
+                              ) : (
+                                value
+                              )}
                             </TableCell>
                           );
                         })}

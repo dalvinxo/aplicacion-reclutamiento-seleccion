@@ -15,6 +15,7 @@ export const endpoints = {
       `competencias?page=${pages}&limit=${limit}`,
     getOne: (id: number) => `competencias/${id}`,
     update: (id: number) => `competencias/${id}`,
+
     delete: (id: number) => `competencias/${id}`,
     create: `competencias/`,
     createMultiples: `competencias/multiples`,

@@ -1,7 +1,15 @@
+import { BreadcrumbsCommons } from '../../../commons/BreadcrumbsCommons';
+import { FormularioCompetencia } from './FormularioCompetencia';
+
 export const EditarCompetencia = () => {
+  const breadcrumbs = {
+    [`/mantenimiento/competencias`]: 'Listado de competencias',
+  };
+
   return (
-    <div className="container">
-      <h1>Editar Competencia</h1>
-    </div>
+    <>
+      <BreadcrumbsCommons linksItems={breadcrumbs} title="Editar competencia" />
+      <FormularioCompetencia />
+    </>
   );
 };

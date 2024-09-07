@@ -1,13 +1,14 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { Box, Button, Stack, TextField } from '@mui/material';
+import { Box, Stack, TextField } from '@mui/material';
 import { SpinnerCircularProgress } from '../../../commons/SpinnerCircularProgress';
 import useAlert from '../../../../hook/useAlert';
 import { useEffect } from 'react';
 import {
   useCreateCompetenciaMutation,
   useLazyGetOneCompetenciaQuery,
+  useUpdateCompetenciaMutation,
 } from '../../../../features/competencias/competenciasApiSlice';
 import SaveIcon from '@mui/icons-material/Save';
 
@@ -20,12 +21,15 @@ interface IFormularioCompetencia {
 
 export const FormularioCompetencia = () => {
   const { id } = useParams();
+
   const navigate = useNavigate();
 
   const { AlertComponent, setError } = useAlert();
 
-  const [crearCompetencia, { isLoading }] = useCreateCompetenciaMutation();
-
+  const [crearCompetencia, { isLoading: isLoadingCreate }] =
+    useCreateCompetenciaMutation();
+  const [actualizarCompetencia, { isLoading: isLoadingUpdate }] =
+    useUpdateCompetenciaMutation();
   const [consultarCompetencia, { isFetching }] =
     useLazyGetOneCompetenciaQuery();
 
@@ -33,12 +37,41 @@ export const FormularioCompetencia = () => {
     reset,
     register,
     handleSubmit,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<IFormularioCompetencia>();
 
-  const onSubmit: SubmitHandler<IFormularioCompetencia> = async (data) => {
+  const updateCompetencia = async (
+    id: string,
+    body: IFormularioCompetencia
+  ) => {
+    const idCompetencia = Number(id);
+
+    if (isNaN(idCompetencia)) {
+      setError('El id debe ser un número');
+      return;
+    }
+
+    await actualizarCompetencia({
+      id: idCompetencia,
+      descripcion: body.description,
+    })
+      .unwrap()
+      .then((response) => {
+        enqueueSnackbar('Competencia actualizada correctamente', {
+          variant: 'success',
+        });
+        navigate('/mantenimiento/competencias', { replace: true });
+      })
+      .catch((error: IException) => {
+        setError(error.data.message);
+      });
+  };
+
+  const createCompetencia = async (body: IFormularioCompetencia) => {
     await crearCompetencia({
-      descripcion: data.description,
+      descripcion: body.description,
     })
       .unwrap()
       .then((_response) => {
@@ -52,14 +85,22 @@ export const FormularioCompetencia = () => {
       });
   };
 
+  const onSubmit: SubmitHandler<IFormularioCompetencia> = async (data) => {
+    if (id) {
+      await updateCompetencia(id, data);
+      return;
+    }
+
+    await createCompetencia(data);
+  };
+
   useEffect(() => {
     if (id) {
       consultarCompetencia(parseInt(id))
         .unwrap()
         .then((data) => {
-          reset({
-            description: data.descripcion,
-          });
+          console.log(data);
+          setValue('description', data.descripcion);
         });
     }
   }, [id, reset]);
@@ -74,6 +115,10 @@ export const FormularioCompetencia = () => {
         <Stack spacing={2}>
           <TextField
             label="competencia"
+            aria-autocomplete="none"
+            slotProps={{
+              inputLabel: { shrink: !!watch('description') },
+            }}
             {...register('description', {
               required: 'Por favor, ingrese la competencia',
               minLength: {
@@ -88,24 +133,24 @@ export const FormularioCompetencia = () => {
 
           <LoadingButton
             color="success"
-            loading={isLoading || isFetching}
+            loading={isLoadingCreate || isLoadingUpdate || isFetching}
             loadingPosition="start"
             type="submit"
             startIcon={<SaveIcon />}
             variant="contained"
           >
-            Save
+            Guardar
           </LoadingButton>
-          <Button
+          {/* <Button
             type="submit"
             variant="contained"
             color="success"
             disabled={isLoading}
           >
             Guardar
-          </Button>
+          </Button> */}
 
-          {isLoading && <SpinnerCircularProgress />}
+          {/* {isLoadingCreate || is && <SpinnerCircularProgress />} */}
           <AlertComponent />
         </Stack>
       </Box>

@@ -18,9 +18,6 @@ router.get("/", async (req, res, next) => {
     const competencias = await prisma.competencia.findMany({
       skip: skip,
       take: take,
-      where: {
-        estado: true,
-      },
       orderBy: {
         id_competencia: "desc",
       },

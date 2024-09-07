@@ -11,13 +11,25 @@ export const competenciasApiSlice = apiSlice.injectEndpoints({
       query: ({ pages, limit }) => endpoints.competencias.getAll(pages, limit),
     }),
     getOneCompetencia: builder.query<Competencia, number>({
-      query: (id) => endpoints.puestos.getOneDetails(id),
+      query: (id) => endpoints.competencias.getOne(id),
     }),
     createCompetencia: builder.mutation<Competencia, { descripcion: string }>({
       query: (data) => ({
         url: endpoints.competencias.create,
         method: 'POST',
         body: { ...data },
+      }),
+    }),
+    updateCompetencia: builder.mutation<
+      Competencia,
+      { id: number; descripcion?: string; estado?: boolean }
+    >({
+      query: ({ id, ...data }) => ({
+        url: endpoints.competencias.update(id),
+        method: 'PATCH',
+        body: {
+          ...data,
+        },
       }),
     }),
   }),
@@ -28,4 +40,5 @@ export const {
   useGetOneCompetenciaQuery,
   useLazyGetOneCompetenciaQuery,
   useCreateCompetenciaMutation,
+  useUpdateCompetenciaMutation,
 } = competenciasApiSlice;
