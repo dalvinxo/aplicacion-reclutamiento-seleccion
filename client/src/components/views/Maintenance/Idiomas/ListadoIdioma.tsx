@@ -129,7 +129,7 @@ export const ListadoIdioma = () => {
                 </TableHead>
                 {data && (
                   <TableBody>
-                    {data.idiomas.map((idioma, index) => (
+                    {data.idiomas.map((idioma) => (
                       <TableRow
                         key={idioma.id_idioma}
                         hover

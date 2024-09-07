@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useGetAllPuestosQuery } from '../../../features/puestos/puestosApiSlice';
+import { useGetAllVacantesQuery } from '../../../features/puestos/puestosApiSlice';
 import { SpinnerCircularProgress } from '../../commons/SpinnerCircularProgress';
 import { PuestoList } from './PuestoList';
 import { Box, Pagination } from '@mui/material';
@@ -11,7 +11,7 @@ export const Home = () => {
     setPage(value);
   };
 
-  const { data, isLoading } = useGetAllPuestosQuery(
+  const { data, isLoading } = useGetAllVacantesQuery(
     {
       pages: page,
       limit: 6,

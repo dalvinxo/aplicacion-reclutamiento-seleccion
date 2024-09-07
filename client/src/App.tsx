@@ -29,6 +29,7 @@ import { ListadoIdioma } from './components/views/Maintenance/Idiomas/ListadoIdi
 import { NuevaIdioma } from './components/views/Maintenance/Idiomas/NuevaIdioma';
 import { EditarIdioma } from './components/views/Maintenance/Idiomas/EditarIdioma';
 import { Puestos } from './components/views/Maintenance/Puestos/Puestos';
+import { ListadoPuesto } from './components/views/Maintenance/Puestos/ListadoPuesto';
 
 const router = createBrowserRouter([
   {
@@ -116,6 +117,12 @@ const router = createBrowserRouter([
               {
                 path: 'puestos',
                 element: <Puestos />,
+                children: [
+                  {
+                    index: true,
+                    element: <ListadoPuesto />,
+                  },
+                ],
               },
             ],
           },

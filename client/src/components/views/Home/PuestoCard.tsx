@@ -1,8 +1,8 @@
 import { Card, CardContent, Typography } from '@mui/material';
-import { Puesto } from '../../../features/puestos/puestosTypes';
+import { PuestoVacante } from '../../../features/puestos/puestosTypes';
 
 interface IPuestoCard {
-  puesto: Puesto;
+  puesto: PuestoVacante;
 }
 
 export const PuestoCard = ({ puesto }: IPuestoCard) => {

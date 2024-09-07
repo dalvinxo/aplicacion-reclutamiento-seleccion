@@ -19,6 +19,53 @@ router.get("/", async (req, res, next) => {
     const puestos = await prisma.puesto.findMany({
       skip: skip,
       take: take,
+      orderBy: {
+        id_puesto: "desc",
+      },
+      include: {
+        Departamento: {
+          select: {
+            id_departamento: true,
+            nombre: true,
+          },
+        },
+      },
+    });
+
+    const totalPuestos = await prisma.puesto.count();
+    const totalPages = Math.ceil(totalPuestos / take);
+
+    const puestosPages = puestos.map((puesto) => {
+      const { departamento_id, Departamento, ...puestoFilter } = puesto;
+
+      return { ...puestoFilter, departamento: Departamento.nombre };
+    });
+
+    res.json({
+      page: pages,
+      limit: limits,
+      totalPages: totalPages,
+      total: totalPuestos,
+      puestos: puestosPages,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/vacantes", async (req, res, next) => {
+  const { page, limit } = req.query;
+
+  const pages = Number(page || 1);
+  const limits = Number(limit || 10);
+
+  const skip = (pages - 1) * limits;
+  const take = limits;
+
+  try {
+    const puestos = await prisma.puesto.findMany({
+      skip: skip,
+      take: take,
       where: {
         estado: true,
       },

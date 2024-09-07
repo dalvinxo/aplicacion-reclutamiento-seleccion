@@ -21,18 +21,18 @@ import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 import { SkeletonLoading } from '../../../commons/SkeletonLoading';
 import { Link } from 'react-router-dom';
 import { enqueueSnackbar } from 'notistack';
-import { Idioma } from '../../../../features/idiomas/idiomasTypes';
 import {
-  useGetAllIdiomasQuery,
-  useUpdateIdiomaMutation,
-} from '../../../../features/idiomas/idiomasApiSlice';
+  useGetAllPuestosQuery,
+  useUpdatePuestoMutation,
+} from '../../../../features/puestos/puestosApiSlice';
+import { Puesto } from '../../../../features/puestos/puestosTypes';
 
 export const ListadoPuesto = () => {
   const [page, setPage] = useState<number>(1);
 
-  const [actualizarIdioma] = useUpdateIdiomaMutation();
+  const [actualizarPuesto] = useUpdatePuestoMutation();
 
-  const { data, isLoading, refetch } = useGetAllIdiomasQuery(
+  const { data, isLoading, refetch } = useGetAllPuestosQuery(
     {
       pages: page,
       limit: 5,
@@ -43,15 +43,25 @@ export const ListadoPuesto = () => {
     }
   );
 
-  const columns: IColumnBasic<keyof Idioma>[] = [
+  const columns: IColumnBasic<keyof Puesto>[] = [
     {
-      id: 'id_idioma',
+      id: 'id_puesto',
       headerName: 'ID',
       minWidth: 30,
     },
     {
       id: 'nombre',
-      headerName: 'Idioma',
+      headerName: 'Puesto',
+      minWidth: 80,
+    },
+    {
+      id: 'nivel_riesgo',
+      headerName: 'Riesgo',
+      minWidth: 100,
+    },
+    {
+      id: 'departamento',
+      headerName: 'Departamento',
       minWidth: 100,
     },
     {
@@ -59,7 +69,7 @@ export const ListadoPuesto = () => {
       headerName: 'Estado',
       minWidth: 100,
       formatBool(value) {
-        return value ? 'Activo' : 'Inactivo';
+        return value ? 'Vacante' : 'Lleno';
       },
     },
     { id: 'action', headerName: 'Acciones', minWidth: 100 },
@@ -70,11 +80,11 @@ export const ListadoPuesto = () => {
   };
 
   const handleDelete = async (id: number, estado: boolean) => {
-    await actualizarIdioma({ id, estado })
+    await actualizarPuesto({ id_puesto: id, estado })
       .unwrap()
       .then((_response) => {
         enqueueSnackbar(
-          `Competencia ${id} ${estado ? 'habilitada' : 'deshabilitada'}  correctamente`,
+          `Puesto ${id} ${estado ? 'disponible' : 'ocupado'}  correctamente`,
           {
             variant: estado ? 'success' : 'warning',
           }
@@ -101,17 +111,17 @@ export const ListadoPuesto = () => {
               <Table stickyHeader aria-label="sticky table">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center" colSpan={3}>
-                      Idiomas
+                    <TableCell align="center" colSpan={4}>
+                      Puestos
                     </TableCell>
-                    <TableCell align="center">
+                    <TableCell align="center" colSpan={2}>
                       <Button
                         variant="text"
                         color="success"
                         component={Link}
-                        to="crear-idioma"
+                        to="crear-puesto"
                       >
-                        Crear Idioma
+                        Crear Puesto
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -129,9 +139,9 @@ export const ListadoPuesto = () => {
                 </TableHead>
                 {data && (
                   <TableBody>
-                    {data.idiomas.map((idioma, index) => (
+                    {data.puestos.map((puesto) => (
                       <TableRow
-                        key={idioma.id_idioma}
+                        key={puesto.id_puesto}
                         hover
                         role="checkbox"
                         tabIndex={-1}
@@ -142,7 +152,7 @@ export const ListadoPuesto = () => {
                               <TableCell key={column.id} align={column.align}>
                                 <IconButton
                                   component={Link}
-                                  to={'editar-idioma/' + idioma.id_idioma}
+                                  to={'editar-puesto/' + puesto.id_puesto}
                                   aria-label="edit"
                                   size="small"
                                 >
@@ -152,14 +162,14 @@ export const ListadoPuesto = () => {
                                 <IconButton
                                   onClick={() =>
                                     handleDelete(
-                                      idioma.id_idioma,
-                                      !idioma.estado
+                                      puesto.id_puesto,
+                                      !puesto.estado
                                     )
                                   }
                                   aria-label="delete"
                                   size="small"
                                 >
-                                  {idioma.estado ? (
+                                  {puesto.estado ? (
                                     <ToggleOnIcon color="success" />
                                   ) : (
                                     <ToggleOffIcon color="error" />
@@ -169,7 +179,7 @@ export const ListadoPuesto = () => {
                             );
                           }
 
-                          const value = idioma[column.id];
+                          const value = puesto[column.id];
 
                           return (
                             <TableCell key={column.id} align={column.align}>

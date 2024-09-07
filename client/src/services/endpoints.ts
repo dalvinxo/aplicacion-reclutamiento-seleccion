@@ -7,8 +7,12 @@ export const endpoints = {
   puestos: {
     getAll: (pages: number = 1, limit = 10) =>
       `puestos?page=${pages}&limit=${limit}`,
+    getAllVacantes: (pages: number = 1, limit = 10) =>
+      `puestos/vacantes?page=${pages}&limit=${limit}`,
     getOne: (id: number) => `puestos/${id}`,
     getOneDetails: (id: number) => `puestos/${id}/competenciasYIdiomas`,
+    update: (id: number) => `puestos/${id}`,
+    create: `puestos/`,
   },
   competencias: {
     getAll: (pages: number = 1, limit = 10) =>

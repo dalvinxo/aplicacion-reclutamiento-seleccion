@@ -54,7 +54,7 @@ export const FormularioPuesto = () => {
       nombre: body.nombre,
     })
       .unwrap()
-      .then((response) => {
+      .then((_response) => {
         enqueueSnackbar('Idioma actualizada correctamente', {
           variant: 'success',
         });

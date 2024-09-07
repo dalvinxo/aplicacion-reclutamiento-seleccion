@@ -1,11 +1,11 @@
 import Grid from '@mui/material/Grid2';
-import { Puestos } from '../../../features/puestos/puestosTypes';
+import { Vacantes } from '../../../features/puestos/puestosTypes';
 import { Box } from '@mui/material';
 import { PuestoCard } from './PuestoCard';
 import { Link } from 'react-router-dom';
 
 interface IPuestoList {
-  puestos: Puestos;
+  puestos: Vacantes;
 }
 
 export const PuestoList = ({ puestos }: IPuestoList) => {
