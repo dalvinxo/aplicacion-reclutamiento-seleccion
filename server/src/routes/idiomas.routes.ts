@@ -5,10 +5,34 @@ import { EnumHttpCode } from "../types";
 
 const router = express.Router();
 
-router.get("/", async (_req, res, next) => {
+router.get("/", async (req, res, next) => {
+  const { page, limit } = req.query;
+
+  const pages = Number(page || 1);
+  const limits = Number(limit || 10);
+
+  const skip = (pages - 1) * limits;
+  const take = limits;
+
   try {
-    const idiomas = await prisma.idioma.findMany();
-    res.json(idiomas);
+    const idiomas = await prisma.idioma.findMany({
+      skip: skip,
+      take: take,
+      orderBy: {
+        id_idioma: "desc",
+      },
+    });
+
+    const totalidiomas = await prisma.idioma.count();
+    const totalPages = Math.ceil(totalidiomas / take);
+
+    res.json({
+      page: pages,
+      limit: limits,
+      totalPages: totalPages,
+      total: totalidiomas,
+      idiomas,
+    });
   } catch (error) {
     next(error);
   }

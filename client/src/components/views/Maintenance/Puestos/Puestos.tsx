@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { Outlet } from 'react-router-dom';
 
-export const Idiomas = () => {
+export const Puestos = () => {
   return (
     <>
       <Box padding={3}>

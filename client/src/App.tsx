@@ -25,6 +25,10 @@ import { Idiomas } from './components/views/Maintenance/Idiomas/Idiomas';
 import { NuevaCompetencia } from './components/views/Maintenance/Competencias/NuevaCompetencia';
 import { EditarCompetencia } from './components/views/Maintenance/Competencias/EditarCompetencia';
 import { ListadoCompetencia } from './components/views/Maintenance/Competencias/ListadoCompetencia';
+import { ListadoIdioma } from './components/views/Maintenance/Idiomas/ListadoIdioma';
+import { NuevaIdioma } from './components/views/Maintenance/Idiomas/NuevaIdioma';
+import { EditarIdioma } from './components/views/Maintenance/Idiomas/EditarIdioma';
+import { Puestos } from './components/views/Maintenance/Puestos/Puestos';
 
 const router = createBrowserRouter([
   {
@@ -94,6 +98,24 @@ const router = createBrowserRouter([
               {
                 path: 'idiomas',
                 element: <Idiomas />,
+                children: [
+                  {
+                    index: true,
+                    element: <ListadoIdioma />,
+                  },
+                  {
+                    path: 'crear-idioma',
+                    element: <NuevaIdioma />,
+                  },
+                  {
+                    path: 'editar-idioma/:id',
+                    element: <EditarIdioma />,
+                  },
+                ],
+              },
+              {
+                path: 'puestos',
+                element: <Puestos />,
               },
             ],
           },

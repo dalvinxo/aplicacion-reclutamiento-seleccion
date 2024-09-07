@@ -1,9 +1,5 @@
 import { useState } from 'react';
 import {
-  useGetAllCompetenciasQuery,
-  useUpdateCompetenciaMutation,
-} from '../../../../features/competencias/competenciasApiSlice';
-import {
   Box,
   Button,
   Chip,
@@ -23,16 +19,20 @@ import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import ToggleOffIcon from '@mui/icons-material/ToggleOff';
 
 import { SkeletonLoading } from '../../../commons/SkeletonLoading';
-import { Competencia } from '../../../../features/competencias/competenciasTypes';
 import { Link } from 'react-router-dom';
 import { enqueueSnackbar } from 'notistack';
+import { Idioma } from '../../../../features/idiomas/idiomasTypes';
+import {
+  useGetAllIdiomasQuery,
+  useUpdateIdiomaMutation,
+} from '../../../../features/idiomas/idiomasApiSlice';
 
-export const ListadoCompetencia = () => {
+export const ListadoIdioma = () => {
   const [page, setPage] = useState<number>(1);
 
-  const [actualizarCompetencia] = useUpdateCompetenciaMutation();
+  const [actualizarIdioma] = useUpdateIdiomaMutation();
 
-  const { data, isLoading, refetch } = useGetAllCompetenciasQuery(
+  const { data, isLoading, refetch } = useGetAllIdiomasQuery(
     {
       pages: page,
       limit: 5,
@@ -43,15 +43,15 @@ export const ListadoCompetencia = () => {
     }
   );
 
-  const columns: IColumnBasic<keyof Competencia>[] = [
+  const columns: IColumnBasic<keyof Idioma>[] = [
     {
-      id: 'id_competencia',
+      id: 'id_idioma',
       headerName: 'ID',
       minWidth: 30,
     },
     {
-      id: 'descripcion',
-      headerName: 'Descripción',
+      id: 'nombre',
+      headerName: 'Idioma',
       minWidth: 100,
     },
     {
@@ -65,16 +65,16 @@ export const ListadoCompetencia = () => {
     { id: 'action', headerName: 'Acciones', minWidth: 100 },
   ];
 
-  const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handleChange = (_event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
   };
 
   const handleDelete = async (id: number, estado: boolean) => {
-    await actualizarCompetencia({ id, estado })
+    await actualizarIdioma({ id, estado })
       .unwrap()
-      .then((response) => {
+      .then((_response) => {
         enqueueSnackbar(
-          `Competencia ${id} ${estado ? 'habilitada' : 'deshabilitada'}  correctamente`,
+          `Idioma ${id} ${estado ? 'habilitada' : 'deshabilitada'}  correctamente`,
           {
             variant: estado ? 'success' : 'warning',
           }
@@ -102,16 +102,16 @@ export const ListadoCompetencia = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell align="center" colSpan={3}>
-                      Competencias
+                      Idiomas
                     </TableCell>
                     <TableCell align="center">
                       <Button
                         variant="text"
                         color="success"
                         component={Link}
-                        to="crear-competencia"
+                        to="crear-idioma"
                       >
-                        Crear Competencia
+                        Crear Idioma
                       </Button>
                     </TableCell>
                   </TableRow>
@@ -129,9 +129,9 @@ export const ListadoCompetencia = () => {
                 </TableHead>
                 {data && (
                   <TableBody>
-                    {data.competencias.map((competencia, index) => (
+                    {data.idiomas.map((idioma, index) => (
                       <TableRow
-                        key={competencia.id_competencia}
+                        key={idioma.id_idioma}
                         hover
                         role="checkbox"
                         tabIndex={-1}
@@ -142,10 +142,7 @@ export const ListadoCompetencia = () => {
                               <TableCell key={column.id} align={column.align}>
                                 <IconButton
                                   component={Link}
-                                  to={
-                                    'editar-competencia/' +
-                                    competencia.id_competencia
-                                  }
+                                  to={'editar-idioma/' + idioma.id_idioma}
                                   aria-label="edit"
                                   size="small"
                                 >
@@ -155,14 +152,14 @@ export const ListadoCompetencia = () => {
                                 <IconButton
                                   onClick={() =>
                                     handleDelete(
-                                      competencia.id_competencia,
-                                      !competencia.estado
+                                      idioma.id_idioma,
+                                      !idioma.estado
                                     )
                                   }
                                   aria-label="delete"
                                   size="small"
                                 >
-                                  {competencia.estado ? (
+                                  {idioma.estado ? (
                                     <ToggleOnIcon color="success" />
                                   ) : (
                                     <ToggleOffIcon color="error" />
@@ -172,7 +169,7 @@ export const ListadoCompetencia = () => {
                             );
                           }
 
-                          const value = competencia[column.id];
+                          const value = idioma[column.id];
 
                           return (
                             <TableCell key={column.id} align={column.align}>
