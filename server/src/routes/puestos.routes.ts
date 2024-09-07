@@ -111,9 +111,51 @@ router.post(
   "/",
   authorize([EnumRoles.USER, EnumRoles.ADMIN]),
   async (req, res, next) => {
+    const {
+      nombre,
+      descripcion,
+      nivel_riesgo,
+      nivel_minimo_salario,
+      nivel_maximo_salario,
+      departamento_id,
+      competencias,
+      idiomas,
+    } = req.body;
+
     try {
       const puesto = await prisma.puesto.create({
-        data: req.body,
+        data: {
+          nombre,
+          descripcion,
+          nivel_riesgo,
+          nivel_minimo_salario,
+          nivel_maximo_salario,
+          departamento_id,
+        },
+      });
+
+      const puestoCompetencias = competencias.map((competencia_id: number) => {
+        return {
+          puesto_id: puesto.id_puesto,
+          competencia_id,
+        };
+      });
+
+      // Insertar todas las competencias en batch
+      await prisma.puestoCompetencia.createMany({
+        data: puestoCompetencias,
+      });
+
+      const puestoIdiomas = idiomas.map((idioma_id: number) => {
+        return {
+          puesto_id: puesto.id_puesto,
+          idioma_id,
+        };
+      });
+
+      // Insertar todos los idiomas en batch
+      await prisma.puestoIdioma.createMany({
+        data: puestoIdiomas,
       });
 
       res.status(EnumHttpCode.CREATED).json(puesto);

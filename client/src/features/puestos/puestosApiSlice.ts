@@ -1,3 +1,4 @@
+import { IFormularioPuesto } from '../../components/views/Maintenance/Puestos/FormularioPuesto';
 import { apiSlice } from '../../services/apiSlice';
 import { endpoints } from '../../services/endpoints';
 import {
@@ -22,6 +23,13 @@ export const puestosApiSlice = apiSlice.injectEndpoints({
     getPuestoDetailsById: builder.query<PuestoDetails, number>({
       query: (id) => endpoints.puestos.getOneDetails(id),
     }),
+    createPuesto: builder.mutation<RootPuesto, IFormularioPuesto>({
+      query: (body) => ({
+        url: endpoints.puestos.create,
+        method: 'POST',
+        body,
+      }),
+    }),
     updatePuesto: builder.mutation<RootPuesto, PutPuesto>({
       query: ({ id_puesto, ...data }) => ({
         url: endpoints.puestos.update(id_puesto),
@@ -39,4 +47,5 @@ export const {
   useGetAllVacantesQuery,
   useGetPuestoDetailsByIdQuery,
   useUpdatePuestoMutation,
+  useCreatePuestoMutation,
 } = puestosApiSlice;

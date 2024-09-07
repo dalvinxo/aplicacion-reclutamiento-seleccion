@@ -22,6 +22,7 @@ export const authorize =
         (rolPermit) => authUser.rol == rolPermit
       );
 
+      console.log(authUser.rol, allowedAccessTypes, haveAccessToEndpoint);
       if (!haveAccessToEndpoint) {
         res.status(403).json({
           message: "No tiene suficientes privilegios para acceder al recurso",
