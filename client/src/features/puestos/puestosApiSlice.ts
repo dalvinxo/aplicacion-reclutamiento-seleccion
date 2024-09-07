@@ -3,8 +3,8 @@ import { apiSlice } from '../../services/apiSlice';
 import { endpoints } from '../../services/endpoints';
 import {
   PuestoDetails,
+  PuestoIdiomaCompetencia,
   Puestos,
-  PutPuesto,
   RootPuesto,
   Vacantes,
 } from './puestosTypes';
@@ -20,6 +20,9 @@ export const puestosApiSlice = apiSlice.injectEndpoints({
           endpoints.puestos.getAllVacantes(pages, limit),
       }
     ),
+    getOnePuestoById: builder.query<PuestoIdiomaCompetencia, number>({
+      query: (id) => endpoints.puestos.getOne(id),
+    }),
     getPuestoDetailsById: builder.query<PuestoDetails, number>({
       query: (id) => endpoints.puestos.getOneDetails(id),
     }),
@@ -30,7 +33,10 @@ export const puestosApiSlice = apiSlice.injectEndpoints({
         body,
       }),
     }),
-    updatePuesto: builder.mutation<RootPuesto, PutPuesto>({
+    updatePuesto: builder.mutation<
+      RootPuesto,
+      Partial<IFormularioPuesto> & { id_puesto: number; estado?: boolean }
+    >({
       query: ({ id_puesto, ...data }) => ({
         url: endpoints.puestos.update(id_puesto),
         method: 'PATCH',
@@ -46,6 +52,7 @@ export const {
   useGetAllPuestosQuery,
   useGetAllVacantesQuery,
   useGetPuestoDetailsByIdQuery,
+  useLazyGetOnePuestoByIdQuery,
   useUpdatePuestoMutation,
   useCreatePuestoMutation,
 } = puestosApiSlice;

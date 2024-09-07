@@ -53,6 +53,15 @@ export enum NivelRiesgo {
   Medio = 'Medio',
 }
 
-export type PutPuesto = Partial<Omit<RootPuesto, 'id_puesto'>> & {
+export interface PuestoIdiomaCompetencia {
+  competencias: number[];
+  departamento_id: number;
+  descripcion: string;
+  estado: boolean;
   id_puesto: number;
-};
+  idiomas: number[];
+  nivel_maximo_salario: number;
+  nivel_minimo_salario: number;
+  nivel_riesgo: string;
+  nombre: string;
+}

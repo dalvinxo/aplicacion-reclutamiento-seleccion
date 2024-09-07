@@ -187,16 +187,46 @@ router.get("/:id", async (req, res, next) => {
       where: {
         id_puesto: Number(req.params.id),
       },
+      select: {
+        departamento_id: true,
+        descripcion: true,
+        id_puesto: true,
+        estado: true,
+        nivel_maximo_salario: true,
+        nivel_minimo_salario: true,
+        nivel_riesgo: true,
+        nombre: true,
+        PuestoIdioma: {
+          select: {
+            idioma_id: true,
+          },
+        },
+        PuestoCompetencia: {
+          select: {
+            competencia_id: true,
+          },
+        },
+      },
     });
 
     if (!puesto) {
       res
         .status(EnumHttpCode.NOT_FOUND)
-        .json({ message: "El idioma no existe" });
+        .json({ message: "El puesto no existe" });
       return;
     }
 
-    res.json(puesto);
+    const { PuestoCompetencia, PuestoIdioma, ...data } = puesto;
+
+    const puestoFilter = {
+      ...data,
+      idiomas: PuestoIdioma.map((idioma) => idioma.idioma_id),
+      competencias: PuestoCompetencia.map(
+        (competencia) => competencia.competencia_id
+      ),
+    };
+
+    res.json(puestoFilter);
   } catch (error) {
     next(error);
   }
@@ -287,13 +317,93 @@ router.delete("/:id", async (req, res, next) => {
 });
 
 router.patch("/:id", async (req, res, next) => {
+  const { id } = req.params;
+
+  const { competencias, idiomas, ...data } = req.body;
+
+  const id_puesto = Number(id);
+
   try {
     const puesto = await prisma.puesto.update({
       where: {
-        id_puesto: Number(req.params.id),
+        id_puesto,
       },
-      data: req.body,
+      data: data,
     });
+
+    const competenciasActuales = await prisma.puestoCompetencia.findMany({
+      where: { puesto_id: id_puesto },
+      select: { competencia_id: true },
+    });
+
+    const competenciasActualesIds = competenciasActuales.map(
+      (c) => c.competencia_id
+    );
+
+    const competenciasAEliminar = competenciasActualesIds.filter(
+      (competencia_id) => !competencias.includes(competencia_id)
+    );
+
+    if (competenciasAEliminar.length > 0) {
+      await prisma.puestoCompetencia.deleteMany({
+        where: {
+          puesto_id: id_puesto,
+          competencia_id: { in: competenciasAEliminar },
+        },
+      });
+    }
+
+    const competenciasAAgregar = competencias.filter(
+      (competencia_id: number) =>
+        !competenciasActualesIds.includes(competencia_id)
+    );
+
+    if (competenciasAAgregar.length > 0) {
+      const nuevasCompetencias = competenciasAAgregar.map(
+        (competencia_id: number) => ({
+          puesto_id: id_puesto,
+          competencia_id,
+        })
+      );
+      await prisma.puestoCompetencia.createMany({
+        data: nuevasCompetencias,
+      });
+    }
+
+    const idiomasActuales = await prisma.puestoIdioma.findMany({
+      where: { puesto_id: id_puesto },
+      select: { idioma_id: true },
+    });
+
+    const idiomasActualesIds = idiomasActuales.map((i) => i.idioma_id);
+
+    const idiomasAEliminar = idiomasActualesIds.filter(
+      (idioma_id) => !idiomas.includes(idioma_id)
+    );
+
+    const idiomasAAgregar = idiomas.filter(
+      (idioma_id: number) => !idiomasActualesIds.includes(idioma_id)
+    );
+
+    if (idiomasAEliminar.length > 0) {
+      await prisma.puestoIdioma.deleteMany({
+        where: {
+          puesto_id: id_puesto,
+          idioma_id: { in: idiomasAEliminar },
+        },
+      });
+    }
+
+    if (idiomasAAgregar.length > 0) {
+      const nuevosIdiomas = idiomasAAgregar.map((idioma_id: number) => ({
+        puesto_id: id_puesto,
+        idioma_id,
+      }));
+      await prisma.puestoIdioma.createMany({
+        data: nuevosIdiomas,
+      });
+    }
+
     res.json(puesto);
   } catch (error) {
     next(error);

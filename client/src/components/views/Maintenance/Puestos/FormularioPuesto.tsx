@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { Controller, Resolver, SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import {
   Box,
   Chip,
@@ -10,7 +10,6 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
-  Stack,
   TextField,
 } from '@mui/material';
 import Grid from '@mui/material/Grid2';
@@ -28,8 +27,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useGetFormCrearPuestosQuery } from '../../../../features/forms/formsApiSlice';
 import { SpinnerCircularProgress } from '../../../commons/SpinnerCircularProgress';
 import { NivelRiesgo } from '../../../../features/puestos/puestosTypes';
-import { useCreatePuestoMutation } from '../../../../features/puestos/puestosApiSlice';
+import {
+  useCreatePuestoMutation,
+  useLazyGetOnePuestoByIdQuery,
+  useUpdatePuestoMutation,
+} from '../../../../features/puestos/puestosApiSlice';
 import { enqueueSnackbar } from 'notistack';
+import { useEffect } from 'react';
 
 const formPuestoSchema = yup.object().shape({
   nombre: yup
@@ -80,6 +84,11 @@ export const FormularioPuesto = () => {
   const [crearPuesto, { isLoading: isLoadingCreate }] =
     useCreatePuestoMutation();
 
+  const [actualizarPuesto, { isLoading: isLoadingUpdate }] =
+    useUpdatePuestoMutation();
+
+  const [consultarPuesto] = useLazyGetOnePuestoByIdQuery();
+
   const { data, isLoading } = useGetFormCrearPuestosQuery();
 
   const { AlertComponent, setError } = useAlert();
@@ -88,6 +97,7 @@ export const FormularioPuesto = () => {
     watch,
     control,
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<IFormularioPuesto>({
@@ -101,7 +111,31 @@ export const FormularioPuesto = () => {
         enqueueSnackbar(`Idioma creada correctamente`, {
           variant: 'success',
         });
-        navigate('/mantenimiento/idiomas', { replace: true });
+        navigate('/mantenimiento/puestos', { replace: true });
+      })
+      .catch((error: IException) => {
+        setError(error.data.message);
+      });
+  };
+
+  const updatePuesto = async (id: string, body: IFormularioPuesto) => {
+    const idPuesto = Number(id);
+
+    if (isNaN(idPuesto)) {
+      setError('El id debe ser un número');
+      return;
+    }
+
+    await actualizarPuesto({
+      id_puesto: idPuesto,
+      ...body,
+    })
+      .unwrap()
+      .then((_response) => {
+        enqueueSnackbar('Puesto actualizada correctamente', {
+          variant: 'success',
+        });
+        navigate('/mantenimiento/puestos', { replace: true });
       })
       .catch((error: IException) => {
         setError(error.data.message);
@@ -109,8 +143,30 @@ export const FormularioPuesto = () => {
   };
 
   const onSubmit: SubmitHandler<IFormularioPuesto> = async (data) => {
+    if (id) {
+      console.log(id, data);
+      await updatePuesto(id, data);
+      return;
+    }
+
     createPuesto(data);
   };
+
+  useEffect(() => {
+    if (id) {
+      consultarPuesto(parseInt(id))
+        .unwrap()
+        .then((data) => {
+          console.log(data);
+
+          const dbPuesto = data as IFormularioPuesto;
+          reset({
+            ...dbPuesto,
+          });
+          //  setValue('nombre', data.nombre);
+        });
+    }
+  }, [id, reset]);
 
   return (
     <>
@@ -196,6 +252,7 @@ export const FormularioPuesto = () => {
             <Controller
               name="nivel_riesgo"
               control={control}
+              defaultValue={NivelRiesgo.Bajo}
               render={({ field }) => (
                 <>
                   <Select
@@ -379,7 +436,7 @@ export const FormularioPuesto = () => {
               color="success"
               fullWidth
               loadingPosition="start"
-              loading={isLoading || isLoadingCreate}
+              loading={isLoading || isLoadingCreate || isLoadingUpdate}
               type="submit"
               startIcon={<SaveIcon />}
               variant="contained"

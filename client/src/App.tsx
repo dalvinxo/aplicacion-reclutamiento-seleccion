@@ -31,6 +31,7 @@ import { EditarIdioma } from './components/views/Maintenance/Idiomas/EditarIdiom
 import { Puestos } from './components/views/Maintenance/Puestos/Puestos';
 import { ListadoPuesto } from './components/views/Maintenance/Puestos/ListadoPuesto';
 import { NuevoPuesto } from './components/views/Maintenance/Puestos/NuevoPuesto';
+import { EditarPuesto } from './components/views/Maintenance/Puestos/EditarPuesto';
 
 const router = createBrowserRouter([
   {
@@ -126,6 +127,10 @@ const router = createBrowserRouter([
                   {
                     path: 'crear-puesto',
                     element: <NuevoPuesto />,
+                  },
+                  {
+                    path: 'editar-puesto/:id',
+                    element: <EditarPuesto />,
                   },
                 ],
               },
