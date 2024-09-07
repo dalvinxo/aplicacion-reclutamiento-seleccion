@@ -30,6 +30,7 @@ import { NuevaIdioma } from './components/views/Maintenance/Idiomas/NuevaIdioma'
 import { EditarIdioma } from './components/views/Maintenance/Idiomas/EditarIdioma';
 import { Puestos } from './components/views/Maintenance/Puestos/Puestos';
 import { ListadoPuesto } from './components/views/Maintenance/Puestos/ListadoPuesto';
+import { NuevoPuesto } from './components/views/Maintenance/Puestos/NuevoPuesto';
 
 const router = createBrowserRouter([
   {
@@ -121,6 +122,10 @@ const router = createBrowserRouter([
                   {
                     index: true,
                     element: <ListadoPuesto />,
+                  },
+                  {
+                    path: 'crear-puesto',
+                    element: <NuevoPuesto />,
                   },
                 ],
               },
