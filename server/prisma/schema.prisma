@@ -126,14 +126,16 @@ model Empleado {
 
 model Usuario {
   id_usuario  Int       @id @default(autoincrement())
-  empleado_id Int
+  empleado_id Int?
   user        String    @unique
+  email       String    @default("empty@outlook.com")
   password    String
   rol_id      Int
   estado      Boolean   @default(true)
   ultimo_login DateTime @default(now())
-  Empleado    Empleado  @relation(fields: [empleado_id], references: [id_empleado])
+  Empleado    Empleado?  @relation(fields: [empleado_id], references: [id_empleado])
   Rol         Rol       @relation(fields: [rol_id], references: [id_rol])
+  UsuarioPersona UsuarioPersona[]
 }
 
 model Rol {
@@ -168,5 +170,14 @@ model Persona {
   Capacitacion          Capacitacion[]
   ExperienciaLaboral    ExperienciaLaboral[]
   Empleado              Empleado[]
+  UsuarioPersona        UsuarioPersona[]
+}
+
+model UsuarioPersona {
+  id_usuario_persona    Int                 @id @default(autoincrement())
+  usuario_id            Int
+  persona_id            Int
+  Persona               Persona  @relation(fields: [persona_id], references: [id_persona])
+  Usuario               Usuario  @relation(fields: [usuario_id], references: [id_usuario])
 }
 

@@ -36,7 +36,7 @@ export type PuestoVacante = Omit<Puesto, 'estado' | 'departamento'> & {
   Departamento: Departamento;
 };
 
-export interface PuestoDetails extends Puesto {
+export interface PuestoDetails extends PuestoVacante {
   PuestoCompetencia: string[];
   PuestoIdioma: string[];
   _count: number;

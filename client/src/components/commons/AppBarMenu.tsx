@@ -21,6 +21,7 @@ import ThemeIcon from '@mui/icons-material/Brightness4';
 import { useAppSelector } from '../../store/hook';
 import { selectCurrentUser } from '../../features/auth/authSlice';
 import { Logout, ConstructionRounded } from '@mui/icons-material';
+import { EnumRoles } from '../../features/auth/authTypes';
 
 export const AppBarMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -45,7 +46,7 @@ export const AppBarMenu = () => {
       }}
     >
       <AppBar
-        position="static"
+        position="sticky"
         elevation={0}
         sx={{
           bgcolor: 'background.paper',
@@ -65,6 +66,12 @@ export const AppBarMenu = () => {
           {!isAuth && (
             <Button color="inherit" component={Link} to="/iniciar-sesion">
               Iniciar Sesión
+            </Button>
+          )}
+
+          {!isAuth && (
+            <Button color="inherit" component={Link} to="/inscribirse">
+              Inscribirse
             </Button>
           )}
 
@@ -90,10 +97,15 @@ export const AppBarMenu = () => {
                   <Avatar /> &nbsp;&nbsp; Perfil
                 </MenuItem>
                 <Divider />
+
                 <MenuItem
                   onClick={handleMenuClose}
                   component={Link}
                   to="/mantenimiento"
+                  sx={{
+                    display:
+                      user.rol_id != EnumRoles.CANDIDATE ? 'block' : 'none',
+                  }}
                 >
                   <ListItemIcon>
                     <ConstructionRounded fontSize="small" />

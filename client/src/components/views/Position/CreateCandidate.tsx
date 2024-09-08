@@ -13,7 +13,7 @@ export const CreateCandidate = () => {
 
   return (
     <>
-      <Grid2 container spacing={2}>
+      <Grid2 container spacing={2} gap={3} marginTop={5}>
         <Grid2 size={4}>
           <BreadcrumbsCommons
             linksItems={breadcrumbs}

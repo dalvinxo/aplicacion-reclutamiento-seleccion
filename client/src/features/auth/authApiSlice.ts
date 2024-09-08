@@ -1,12 +1,22 @@
 import { apiSlice } from '../../services/apiSlice';
 import { endpoints } from '../../services/endpoints';
-import { AuthUser } from './authTypes';
+import { AuthUser, UserSimple } from './authTypes';
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     login: builder.mutation<AuthUser, { username: string; password: string }>({
       query: (credentials) => ({
         url: endpoints.auth.login,
+        method: 'POST',
+        body: { ...credentials },
+      }),
+    }),
+    signup: builder.mutation<
+      UserSimple,
+      { username: string; password: string; email: string }
+    >({
+      query: (credentials) => ({
+        url: endpoints.auth.signup,
         method: 'POST',
         body: { ...credentials },
       }),
@@ -23,5 +33,9 @@ export const authApiSlice = apiSlice.injectEndpoints({
   }),
 });
 
-export const { useGetUserQuery, useLoginMutation, useLogoutMutation } =
-  authApiSlice;
+export const {
+  useGetUserQuery,
+  useLoginMutation,
+  useSignupMutation,
+  useLogoutMutation,
+} = authApiSlice;

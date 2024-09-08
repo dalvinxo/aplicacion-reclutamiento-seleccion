@@ -9,45 +9,53 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { useForm, SubmitHandler } from 'react-hook-form';
-import { useLoginMutation } from '../../../features/auth/authApiSlice';
+import {
+  useLoginMutation,
+  useSignupMutation,
+} from '../../../features/auth/authApiSlice';
 import { SpinnerCircularProgress } from '../../commons/SpinnerCircularProgress';
 import useAlert from '../../../hook/useAlert';
 import { useAppDispatch } from '../../../store/hook';
 import { setUser } from '../../../features/auth/authSlice';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { enqueueSnackbar } from 'notistack';
 
-interface ILoginForm {
+interface ISignupForm {
   username: string;
   password: string;
+  confirmPassword: string;
+  email: string;
 }
 
-const LoginForm = () => {
+const SignupForm = () => {
   const navigate = useNavigate();
-  const dispatch = useAppDispatch();
 
   const { AlertComponent, setError } = useAlert();
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [signup, { isLoading }] = useSignupMutation();
 
   const {
+    watch,
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ILoginForm>();
+  } = useForm<ISignupForm>();
+
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const onSubmit: SubmitHandler<ILoginForm> = async (data) => {
-    await login({ ...data })
+  const onSubmit: SubmitHandler<ISignupForm> = async (data) => {
+    await signup({ ...data })
       .unwrap()
       .then((response) => {
-        dispatch(setUser(response));
-        enqueueSnackbar(`Bienvenido ${response.user}`, { variant: 'success' });
-        navigate('/', { replace: true });
+        enqueueSnackbar(
+          `El usuario ${response.user} fue registrado correctamente`,
+          { variant: 'success' }
+        );
+        navigate('/iniciar-sesion', { replace: true });
       })
       .catch((error: IException) => {
         setError(error.data.message);
@@ -74,6 +82,21 @@ const LoginForm = () => {
           helperText={errors.username?.message}
           margin="normal"
         />
+
+        <TextField
+          label="Correo electrónico"
+          {...register('email', {
+            required: 'Por favor, ingrese su correo electrónico',
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: 'Por favor, ingrese un correo electrónico válido',
+            },
+          })}
+          error={!!errors.email}
+          helperText={errors.email?.message}
+          margin="normal"
+        />
+
         <TextField
           label="Contraseña"
           type={showPassword ? 'text' : 'password'}
@@ -99,16 +122,26 @@ const LoginForm = () => {
             },
           }}
         />
+
+        <TextField
+          label="Confirmar contraseña"
+          type={'password'}
+          {...register('confirmPassword', {
+            required: 'Por favor, confirme su contraseña',
+            validate: (value) =>
+              value === watch('password') || 'Las contraseñas no coinciden',
+          })}
+          error={!!errors.confirmPassword}
+          helperText={errors.confirmPassword?.message}
+          margin="normal"
+        />
+
         <Button
           type="submit"
           variant="contained"
           color="primary"
           disabled={isLoading}
         >
-          Iniciar sesión
-        </Button>
-
-        <Button color="inherit" component={Link} to="/inscribirse">
           Inscribirse
         </Button>
 
@@ -119,4 +152,4 @@ const LoginForm = () => {
   );
 };
 
-export default LoginForm;
+export default SignupForm;

@@ -32,6 +32,8 @@ import { Puestos } from './components/views/Maintenance/Puestos/Puestos';
 import { ListadoPuesto } from './components/views/Maintenance/Puestos/ListadoPuesto';
 import { NuevoPuesto } from './components/views/Maintenance/Puestos/NuevoPuesto';
 import { EditarPuesto } from './components/views/Maintenance/Puestos/EditarPuesto';
+import { Signup } from './components/views/Signup/Signup';
+import { LayoutAccess } from './components/layouts/LayoutAccess';
 
 const router = createBrowserRouter([
   {
@@ -50,10 +52,6 @@ const router = createBrowserRouter([
             index: true,
             element: <PositionDetails />,
           },
-          {
-            path: 'crear-candidato',
-            element: <CreateCandidate />,
-          },
         ],
       },
       {
@@ -63,15 +61,32 @@ const router = createBrowserRouter([
             path: 'iniciar-sesion',
             element: <Login />,
           },
+          {
+            path: 'inscribirse',
+            element: <Signup />,
+          },
         ],
       },
       {
         element: <LayoutAuth />,
         children: [
           {
+            path: ':puesto_id/crear-candidato',
+            element: <CreateCandidate />,
+          },
+          {
             path: 'cerrar-sesion',
             element: <Logout />,
           },
+          {
+            path: 'perfil',
+            element: <Profile />,
+          },
+        ],
+      },
+      {
+        element: <LayoutAccess />,
+        children: [
           {
             path: 'mantenimiento',
             element: <Maintenance />,
@@ -135,10 +150,6 @@ const router = createBrowserRouter([
                 ],
               },
             ],
-          },
-          {
-            path: 'perfil',
-            element: <Profile />,
           },
         ],
       },

@@ -67,17 +67,7 @@ export const PositionDetails = () => {
           {data.PuestoIdioma.length > 0 && (
             <Grid size={12}>
               <Typography variant="body1" component="p">
-                Idiomas:
-                <List>
-                  {data.PuestoIdioma.map((idioma, index) => (
-                    <ListItem key={index}>
-                      <ListItemIcon>
-                        <RadioButtonCheckedOutlinedIcon fontSize="small" />
-                      </ListItemIcon>
-                      <ListItemText primary={idioma} />
-                    </ListItem>
-                  ))}
-                </List>
+                Idiomas: {data.PuestoIdioma.join(', ')}
               </Typography>
             </Grid>
           )}

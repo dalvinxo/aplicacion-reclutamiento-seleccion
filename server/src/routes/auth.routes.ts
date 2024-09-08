@@ -44,6 +44,7 @@ router.post("/login", async (req, res, next) => {
       select: {
         rol_id: true,
         user: true,
+        email: true,
         empleado_id: true,
         ultimo_login: true,
         id_usuario: true,
@@ -103,6 +104,50 @@ router.post("/login", async (req, res, next) => {
         maxAge: 1000 * 60 * 60,
       })
       .json(usuario);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.post("/sign-up", async (req, res, next) => {
+  try {
+    const { username, email, password } = req.body;
+
+    const message = validationUser(username, password);
+
+    if (message) {
+      res.status(EnumHttpCode.BAD_REQUEST).json({ message });
+      return;
+    }
+
+    const user = await prisma.usuario.findFirst({
+      where: {
+        email: email,
+      },
+    });
+
+    if (user) {
+      res.status(EnumHttpCode.BAD_REQUEST).json({
+        message: "Existe un usuario con este correo",
+      });
+      return;
+    }
+
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
+
+    const usuario = await prisma.usuario.create({
+      data: {
+        password: hash,
+        user: username,
+        email: email,
+        rol_id: EnumRoles.CANDIDATE,
+      },
+    });
+
+    const { password: pass, estado, rol_id, ultimo_login, ...result } = usuario;
+
+    res.status(EnumHttpCode.CREATED).json(result);
   } catch (error) {
     next(error);
   }

@@ -13,6 +13,7 @@ export enum EnumHttpCode {
 export enum EnumRoles {
   ADMIN = 1,
   USER = 2,
+  CANDIDATE = 4,
 }
 
 export interface RequestCustom<T> extends Request {
