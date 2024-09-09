@@ -14,14 +14,18 @@ import { authorize } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
-router.get("/", async (_req, res, next) => {
-  try {
-    const candidatos = await prisma.candidato.findMany();
-    res.json(candidatos);
-  } catch (error) {
-    next(error);
+router.get(
+  "/",
+  authorize([EnumRoles.ADMIN, EnumRoles.USER]),
+  async (_req, res, next) => {
+    try {
+      const candidatos = await prisma.candidato.findMany();
+      res.json(candidatos);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.post("/", async (req, res, next) => {
   try {
