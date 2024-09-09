@@ -29,3 +29,10 @@ export interface IExperienciaLaboral {
   puesto_ocupado: string;
   salario: number;
 }
+
+export interface IPerson {
+  cedula: string;
+  estado: boolean;
+  id_persona: number;
+  nombre: string;
+}

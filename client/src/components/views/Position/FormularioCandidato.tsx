@@ -222,8 +222,7 @@ export const FormularioCandidato = () => {
     })
       .unwrap()
       .then((response) => {
-        console.log(response);
-        enqueueSnackbar(`Idioma creada correctamente`, {
+        enqueueSnackbar(`Gracias ${response.nombre} por aplicar`, {
           variant: 'success',
         });
         navigate('/' + idPuesto, { replace: true });
