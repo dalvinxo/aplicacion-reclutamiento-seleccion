@@ -155,7 +155,7 @@ router.post("/sign-up", async (req, res, next) => {
 
 router.get(
   "/user",
-  authorize([EnumRoles.USER, EnumRoles.ADMIN]),
+  authorize([EnumRoles.USER, EnumRoles.ADMIN, EnumRoles.CANDIDATE]),
   async (req, res, next) => {
     try {
       const auth = (req as RequestCustom<PayloadJwt>).user;
