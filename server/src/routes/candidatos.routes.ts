@@ -1,7 +1,16 @@
 import express from "express";
 
 import { prisma } from "../libs/prisma";
-import { EnumHttpCode, EnumStatusCandidato, ICreatePerson } from "../types";
+import {
+  EnumHttpCode,
+  EnumRoles,
+  EnumStatusCandidato,
+  ICreatePerson,
+  PayloadJwt,
+  RequestCustom,
+} from "../types";
+import { validationCedula } from "../utils/validation.utils";
+import { authorize } from "../middleware/auth.middleware";
 
 const router = express.Router();
 
@@ -87,10 +96,14 @@ router.patch("/:id", async (req, res, next) => {
   }
 });
 
-router.post("/detalles", async (req, res, next) => {
-  try {
+router.post(
+  "/detalles",
+  authorize([EnumRoles.CANDIDATE]),
+  async (req, res, next) => {
     const { puesto_aspirado_id, salario_aspirado, recomendado_por, persona } =
       req.body;
+
+    const auth = (req as RequestCustom<PayloadJwt>).user;
 
     const {
       cedula,
@@ -101,49 +114,67 @@ router.post("/detalles", async (req, res, next) => {
       idiomas = [],
     } = persona as ICreatePerson;
 
-    const personaCandidato = await prisma.persona.create({
-      data: {
-        cedula: cedula,
-        nombre: nombre,
-        PersonaCompetencia: {
-          create: competencias.map((competencia) => ({
-            competencia_id: competencia.competencia_id,
-          })),
-        },
-        PersonaIdioma: {
-          create: idiomas.map((idioma) => ({
-            idioma_id: idioma.idioma_id,
-          })),
-        },
-        ExperienciaLaboral: {
-          create: experienciaLaboral,
-        },
-        Capacitacion: {
-          create: capacitaciones,
-        },
-        Candidato: {
-          create: {
-            puesto_aspirado_id: puesto_aspirado_id,
-            salario_aspirado: salario_aspirado,
-            recomendado_por: recomendado_por,
-            estado_candidato_id: EnumStatusCandidato.POSTULADO,
+    try {
+      const cedulaIsValid = validationCedula(cedula);
+
+      if (!cedulaIsValid) {
+        res
+          .status(EnumHttpCode.BAD_REQUEST)
+          .json({ message: "La cédula es invalida" });
+        return;
+      }
+
+      const personaCandidato = await prisma.persona.create({
+        data: {
+          cedula: cedula,
+          nombre: nombre,
+          PersonaCompetencia: {
+            create: competencias.map((competencia_id) => ({
+              competencia_id: competencia_id,
+            })),
+          },
+          PersonaIdioma: {
+            create: idiomas.map((idioma_id) => ({
+              idioma_id: idioma_id,
+            })),
+          },
+          ExperienciaLaboral: {
+            create: experienciaLaboral,
+          },
+          Capacitacion: {
+            create: capacitaciones,
+          },
+          Candidato: {
+            create: {
+              puesto_aspirado_id: puesto_aspirado_id,
+              salario_aspirado: salario_aspirado,
+              recomendado_por: recomendado_por,
+              estado_candidato_id: EnumStatusCandidato.POSTULADO,
+            },
           },
         },
-      },
-      include: {
-        Capacitacion: true,
-        ExperienciaLaboral: true,
-        PersonaCompetencia: true,
-        PersonaIdioma: true,
-        Candidato: true,
-      },
-    });
+        include: {
+          Capacitacion: true,
+          ExperienciaLaboral: true,
+          PersonaCompetencia: true,
+          PersonaIdioma: true,
+          Candidato: true,
+        },
+      });
 
-    res.status(EnumHttpCode.CREATED).json(personaCandidato);
-  } catch (error) {
-    next(error);
+      await prisma.usuarioPersona.create({
+        data: {
+          usuario_id: auth.usuario_id,
+          persona_id: personaCandidato.id_persona,
+        },
+      });
+
+      res.status(EnumHttpCode.CREATED).json(personaCandidato);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.patch("/:id/contratar", async (req, res, next) => {
   try {

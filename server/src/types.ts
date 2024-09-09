@@ -50,8 +50,8 @@ export interface IExperienciaLaboral {
 export interface ICreatePerson {
   cedula: string;
   nombre: string;
-  idiomas?: { idioma_id: number }[];
-  competencias?: { competencia_id: number }[];
+  idiomas?: number[];
+  competencias?: number[];
   capacitaciones?: ICapacitaciones[];
   experienciaLaboral?: IExperienciaLaboral[];
 }

@@ -56,7 +56,7 @@ export const AppBarMenu = () => {
       >
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Reclutamiento Open Source II
+            Tech In
           </Typography>
 
           <Button color="inherit" component={Link} to="/">

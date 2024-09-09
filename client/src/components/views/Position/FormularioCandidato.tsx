@@ -19,31 +19,34 @@ import { formatCedula } from '../../../utils/formatCedula.utils';
 import { LoadingButton } from '@mui/lab';
 import useAlert from '../../../hook/useAlert';
 import SaveIcon from '@mui/icons-material/Save';
+import { useCreateCandidatoMutation } from '../../../features/candidatos/candidatosApiSlice';
+import { useNavigate, useParams } from 'react-router-dom';
+import { enqueueSnackbar } from 'notistack';
 
-interface FormData {
-  nombre: string;
-  cedula: string;
-  idiomas: number[];
-  competencias: number[];
-  capacitaciones: Capacitacion[];
-  experienciaLaboral: ExperienciaLaboral[];
-}
+// interface FormData {
+//   nombre: string;
+//   cedula: string;
+//   idiomas: number[];
+//   competencias: number[];
+//   capacitaciones: Capacitacion[];
+//   experienciaLaboral: ExperienciaLaboral[];
+// }
 
-interface Capacitacion {
-  descripcion: string;
-  nivel: string;
-  fecha_desde: Date;
-  fecha_hasta: Date;
-  institucion: string;
-}
+// interface Capacitacion {
+//   descripcion: string;
+//   nivel: string;
+//   fecha_desde: Date;
+//   fecha_hasta: Date;
+//   institucion: string;
+// }
 
-interface ExperienciaLaboral {
-  empresa: string;
-  puesto_ocupado: string;
-  fecha_desde: Date;
-  fecha_hasta: Date;
-  salario: number;
-}
+// interface ExperienciaLaboral {
+//   empresa: string;
+//   puesto_ocupado: string;
+//   fecha_desde: Date;
+//   fecha_hasta: Date;
+//   salario: number;
+// }
 
 const capacitacionSchema = yup.object().shape({
   descripcion: yup.string().required('La descripción es requerida.'),
@@ -140,13 +143,18 @@ export interface IFormularioCandidato
   extends yup.InferType<typeof formCandidatoSchema> {}
 
 export const FormularioCandidato = () => {
-  const { AlertComponent, setError } = useAlert();
+  const { puesto_id } = useParams();
+  const navigate = useNavigate();
+
+  const [crearCandidato, { isLoading }] = useCreateCandidatoMutation();
+  const { data, isFetching, isSuccess } = useGetFormCrearCandidatosQuery();
+
+  const { AlertComponent, setError: setErrorServer } = useAlert();
 
   const {
-    watch,
     control,
     register,
-    reset,
+    setError,
     handleSubmit,
     formState: { errors },
   } = useForm<IFormularioCandidato>({
@@ -191,10 +199,48 @@ export const FormularioCandidato = () => {
     name: 'experiencias_laborales',
   });
 
-  const { data, isFetching, isSuccess } = useGetFormCrearCandidatosQuery();
+  const createCandidato = async (body: IFormularioCandidato) => {
+    const idPuesto = Number(puesto_id);
+
+    if (isNaN(idPuesto)) {
+      setErrorServer('Ha ocurrido un error, por favor verificar el enlace');
+      return;
+    }
+
+    await crearCandidato({
+      persona: {
+        nombre: body.nombre,
+        cedula: body.cedula,
+        capacitaciones: body.capacitaciones,
+        experienciaLaboral: body.experiencias_laborales,
+        competencias: (body.competencias as number[]) || [],
+        idiomas: (body.idiomas as number[]) || [],
+      },
+      puesto_aspirado_id: idPuesto,
+      recomendado_por: body.recomendado_por || '',
+      salario_aspirado: body.salario_aspirado,
+    })
+      .unwrap()
+      .then((response) => {
+        console.log(response);
+        enqueueSnackbar(`Idioma creada correctamente`, {
+          variant: 'success',
+        });
+        navigate('/' + idPuesto, { replace: true });
+      })
+      .catch((error: IException) => {
+        if (error.data.message.startsWith('La cédula')) {
+          setError('cedula', {
+            type: 'manual',
+            message: error.data.message,
+          });
+        }
+        setErrorServer(error.data.message);
+      });
+  };
 
   const onSubmit = (data: IFormularioCandidato) => {
-    console.log(data);
+    createCandidato(data);
   };
 
   return (
@@ -204,10 +250,6 @@ export const FormularioCandidato = () => {
       {isSuccess && (
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={2}>
-            <Grid size={12}>
-              <AlertComponent />
-            </Grid>
-
             <Grid size={6}>
               <Controller
                 name="nombre"
@@ -666,12 +708,16 @@ export const FormularioCandidato = () => {
               />
             </Grid>
 
+            <Grid size={12}>
+              <AlertComponent />
+            </Grid>
+
             <Grid size={12} padding={'1rem'}>
               <LoadingButton
                 color="success"
                 fullWidth
                 loadingPosition="start"
-                loading={isFetching}
+                loading={isFetching || isLoading}
                 type="submit"
                 startIcon={<SaveIcon />}
                 variant="contained"

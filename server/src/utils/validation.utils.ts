@@ -25,30 +25,30 @@ export const validationUser: (user: any, password: any) => string = (
   return "";
 };
 
-// export const validationCedula: (cedula: string) => boolean = (cedula) => {
-//   cedula = cedula.replace(/-/g, "").trim();
+export const validationCedula: (cedula: string) => boolean = (cedula) => {
+  cedula = cedula.replace(/-/g, "").trim();
 
-//   if (cedula.length !== 11) {
-//     return false;
-//   }
+  if (cedula.length !== 11) {
+    return false;
+  }
 
-//   const cedulaNumeros = cedula.split("").map(Number);
+  const cedulaNumeros = cedula.split("").map(Number);
 
-//   const multiplicadores = [1, 2];
+  const multiplicadores = [1, 2];
 
-//   let suma = 0;
+  let suma = 0;
 
-//   for (let i = 0; i < 10; i++) {
-//     let multiplicacion = cedulaNumeros[i] * multiplicadores[i % 2];
-//     if (multiplicacion >= 10) {
-//       multiplicacion = Math.floor(multiplicacion / 10) + (multiplicacion % 10);
-//     }
-//     suma += multiplicacion;
-//   }
+  for (let i = 0; i < 10; i++) {
+    let multiplicacion = cedulaNumeros[i] * multiplicadores[i % 2];
+    if (multiplicacion >= 10) {
+      multiplicacion = Math.floor(multiplicacion / 10) + (multiplicacion % 10);
+    }
+    suma += multiplicacion;
+  }
 
-//   const residuo = suma % 10;
+  const residuo = suma % 10;
 
-//   const digitoVerificador = residuo === 0 ? 0 : 10 - residuo;
+  const digitoVerificador = residuo === 0 ? 0 : 10 - residuo;
 
-//   return digitoVerificador === cedulaNumeros[10];
-// };
+  return digitoVerificador === cedulaNumeros[10];
+};

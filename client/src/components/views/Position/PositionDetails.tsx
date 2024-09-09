@@ -91,13 +91,23 @@ export const PositionDetails = () => {
           )}
         </Grid>
       )}
+      <Grid size={12}>
+        <Chip
+          label={`Candidatos: ${data?._count}`}
+          color="info"
+          sx={{
+            fontWeight: 'bold',
+            fontSize: '1rem',
+          }}
+        />
+      </Grid>
 
       <Link to="crear-candidato" style={{ textDecoration: 'none' }}>
         <Button
           variant="outlined"
-          color="info"
+          color="success"
           size="medium"
-          sx={{ marginTop: '1rem' }}
+          sx={{ marginTop: '3rem', minWidth: 200 }}
         >
           Aplicar
         </Button>

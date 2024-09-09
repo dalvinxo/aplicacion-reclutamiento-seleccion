@@ -15,6 +15,9 @@ export const endpoints = {
     update: (id: number) => `puestos/${id}`,
     create: `puestos/`,
   },
+  candidatos: {
+    create: `candidatos/detalles`,
+  },
   competencias: {
     getAll: (pages: number = 1, limit = 10) =>
       `competencias?page=${pages}&limit=${limit}`,
