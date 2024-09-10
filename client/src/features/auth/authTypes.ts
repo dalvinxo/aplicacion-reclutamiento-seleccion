@@ -37,3 +37,38 @@ export interface PuestoEmpleado {
 export interface Departamento {
   nombre: string;
 }
+
+export interface UserPersonCandidate {
+  persona: PersonaUserCandidate;
+  puesto_aspirado_id: number;
+  recomendado_por: string;
+  salario_aspirado: number;
+}
+
+export interface PersonaUserCandidate {
+  capacitaciones: CapacitacioneCandidate[];
+  cedula: string;
+  competencia: number[];
+  experienciaLaboral: ExperienciaLaboralCandidate[];
+  idioma: number[];
+  nombre: string;
+  persona_id: number;
+}
+
+export interface CapacitacioneCandidate {
+  id_capacitacion: number;
+  descripcion: string;
+  fecha_desde: Date;
+  fecha_hasta: Date;
+  institucion: string;
+  nivel: string;
+}
+
+export interface ExperienciaLaboralCandidate {
+  id_experiencia_laboral: number;
+  empresa: string;
+  fecha_desde: Date;
+  fecha_hasta: Date;
+  puesto_ocupado: string;
+  salario: number;
+}

@@ -19,36 +19,17 @@ import { formatCedula } from '../../../utils/formatCedula.utils';
 import { LoadingButton } from '@mui/lab';
 import useAlert from '../../../hook/useAlert';
 import SaveIcon from '@mui/icons-material/Save';
-import { useCreateCandidatoMutation } from '../../../features/candidatos/candidatosApiSlice';
+import {
+  useCreateCandidatoMutation,
+  useUpdateCandidatoMutation,
+} from '../../../features/candidatos/candidatosApiSlice';
 import { useNavigate, useParams } from 'react-router-dom';
 import { enqueueSnackbar } from 'notistack';
-
-// interface FormData {
-//   nombre: string;
-//   cedula: string;
-//   idiomas: number[];
-//   competencias: number[];
-//   capacitaciones: Capacitacion[];
-//   experienciaLaboral: ExperienciaLaboral[];
-// }
-
-// interface Capacitacion {
-//   descripcion: string;
-//   nivel: string;
-//   fecha_desde: Date;
-//   fecha_hasta: Date;
-//   institucion: string;
-// }
-
-// interface ExperienciaLaboral {
-//   empresa: string;
-//   puesto_ocupado: string;
-//   fecha_desde: Date;
-//   fecha_hasta: Date;
-//   salario: number;
-// }
+import { useLazyGetCandidateUserQuery } from '../../../features/auth/authApiSlice';
+import { useEffect } from 'react';
 
 const capacitacionSchema = yup.object().shape({
+  capacitacion_id: yup.number().optional().default(0),
   descripcion: yup.string().required('La descripción es requerida.'),
   nivel: yup
     .string()
@@ -66,34 +47,35 @@ const capacitacionSchema = yup.object().shape({
       'El nivel no es válido.'
     ),
   fecha_desde: yup
-    .date()
+    .string()
     .required('La fecha desde es requerida.')
     .typeError('La fecha desde es invalida.'),
   fecha_hasta: yup
-    .date()
+    .string()
     .required('La fecha hasta es requerida.')
-    .min(
-      yup.ref('fecha_desde'),
-      'La fecha hasta debe ser posterior a la fecha desde.'
-    )
+    // .min(
+    //   yup.ref('fecha_desde'),
+    //   'La fecha hasta debe ser posterior a la fecha desde.'
+    // )
     .typeError('La fecha hasta es invalida.'),
   institucion: yup.string().required('La institución es requerida.'),
 });
 
 const experienciaLaboralSchema = yup.object().shape({
+  experiencia_id: yup.number().optional().default(0),
   empresa: yup.string().required('La empresa es requerida.'),
   puesto_ocupado: yup.string().required('El puesto ocupado es requerido.'),
   fecha_desde: yup
-    .date()
+    .string()
     .required('La fecha desde es requerida.')
     .typeError('La fecha desde es invalida.'),
   fecha_hasta: yup
-    .date()
+    .string()
     .required('La fecha hasta es requerida.')
-    .min(
-      yup.ref('fecha_desde'),
-      'La fecha hasta debe ser posterior a la fecha desde.'
-    )
+    // .min(
+    //   yup.ref('fecha_desde'),
+    //   'La fecha hasta debe ser posterior a la fecha desde.'
+    // )
     .typeError('La fecha hasta es invalida.'),
   salario: yup
     .number()
@@ -102,6 +84,7 @@ const experienciaLaboralSchema = yup.object().shape({
 });
 
 const formCandidatoSchema = yup.object().shape({
+  persona_id: yup.number().optional().default(0),
   nombre: yup
     .string()
     .required('El nombre es requerido.')
@@ -146,13 +129,63 @@ export const FormularioCandidato = () => {
   const { puesto_id } = useParams();
   const navigate = useNavigate();
 
-  const [crearCandidato, { isLoading }] = useCreateCandidatoMutation();
+  const [consultarCandidate, { isLoading: isLoadingCandidate }] =
+    useLazyGetCandidateUserQuery();
+  const [crearCandidato, { isLoading: isLoadingCrear }] =
+    useCreateCandidatoMutation();
+  const [actualizarCandidato, { isLoading: isLoadingActualizar }] =
+    useUpdateCandidatoMutation();
+
   const { data, isFetching, isSuccess } = useGetFormCrearCandidatosQuery();
 
   const { AlertComponent, setError: setErrorServer } = useAlert();
 
+  useEffect(() => {
+    consultarCandidate()
+      .unwrap()
+      .then((data) => {
+        const experiencia = data.persona.experienciaLaboral.map(
+          (experiencia) => ({
+            ...experiencia,
+            experiencia_id: experiencia.id_experiencia_laboral,
+            fecha_desde: new Date(experiencia.fecha_desde)
+              .toISOString()
+              .split('T')[0],
+            fecha_hasta: new Date(experiencia.fecha_hasta)
+              .toISOString()
+              .split('T')[0],
+          })
+        );
+
+        const capacitacion = data.persona.capacitaciones.map(
+          (capacitacion) => ({
+            ...capacitacion,
+            capacitacion_id: capacitacion.id_capacitacion,
+            fecha_desde: new Date(capacitacion.fecha_desde)
+              .toISOString()
+              .split('T')[0],
+            fecha_hasta: new Date(capacitacion.fecha_hasta)
+              .toISOString()
+              .split('T')[0],
+          })
+        );
+        reset({
+          capacitaciones: capacitacion,
+          experiencias_laborales: experiencia,
+          idiomas: data.persona.idioma,
+          competencias: data.persona.competencia,
+          salario_aspirado: data.salario_aspirado,
+          recomendado_por: data.recomendado_por,
+          cedula: data.persona.cedula,
+          nombre: data.persona.nombre,
+          persona_id: data.persona.persona_id,
+        });
+      });
+  }, []);
+
   const {
     control,
+    reset,
     register,
     setError,
     handleSubmit,
@@ -164,8 +197,8 @@ export const FormularioCandidato = () => {
         {
           descripcion: '',
           nivel: '',
-          fecha_desde: new Date(''),
-          fecha_hasta: new Date(''),
+          fecha_desde: '',
+          fecha_hasta: '',
           institucion: '',
         },
       ],
@@ -173,8 +206,8 @@ export const FormularioCandidato = () => {
         {
           empresa: '',
           puesto_ocupado: '',
-          fecha_desde: new Date(''),
-          fecha_hasta: new Date(''),
+          fecha_desde: '',
+          fecha_hasta: '',
           salario: 0,
         },
       ],
@@ -211,8 +244,68 @@ export const FormularioCandidato = () => {
       persona: {
         nombre: body.nombre,
         cedula: body.cedula,
-        capacitaciones: body.capacitaciones,
-        experienciaLaboral: body.experiencias_laborales,
+        capacitaciones: body.capacitaciones.map((capacitacion) => ({
+          ...capacitacion,
+          fecha_desde: new Date(capacitacion.fecha_desde),
+          fecha_hasta: new Date(capacitacion.fecha_hasta),
+        })),
+        experienciaLaboral: body.experiencias_laborales.map((experiencia) => ({
+          ...experiencia,
+          fecha_desde: new Date(experiencia.fecha_desde),
+          fecha_hasta: new Date(experiencia.fecha_hasta),
+        })),
+        competencias: (body.competencias as number[]) || [],
+        idiomas: (body.idiomas as number[]) || [],
+      },
+      puesto_aspirado_id: idPuesto,
+      recomendado_por: body.recomendado_por || '',
+      salario_aspirado: body.salario_aspirado,
+    })
+      .unwrap()
+      .then((response) => {
+        enqueueSnackbar(`Gracias ${response.nombre} por aplicar`, {
+          variant: 'success',
+        });
+        navigate('/' + idPuesto, { replace: true });
+      })
+      .catch((error: IException) => {
+        if (error.data.message.startsWith('La cédula')) {
+          setError('cedula', {
+            type: 'manual',
+            message: error.data.message,
+          });
+        }
+        setErrorServer(error.data.message);
+      });
+  };
+
+  const updateCandidato = async (body: IFormularioCandidato) => {
+    const idPuesto = Number(puesto_id);
+
+    if (isNaN(idPuesto)) {
+      setErrorServer('Ha ocurrido un error, por favor verificar el enlace');
+      return;
+    }
+
+    await actualizarCandidato({
+      persona_id: body.persona_id,
+      persona: {
+        nombre: body.nombre,
+        cedula: body.cedula,
+        capacitaciones: body.capacitaciones.map((capacitacion) => ({
+          ...capacitacion,
+          fecha_desde: new Date(capacitacion.fecha_desde),
+          fecha_hasta: new Date(capacitacion.fecha_hasta),
+        })),
+        experienciaLaboral: body.experiencias_laborales.map((experiencia) => {
+          const { experiencia_id, ...experiencia_update } = experiencia;
+          return {
+            ...experiencia_update,
+            id_experiencia_laboral: experiencia.experiencia_id,
+            fecha_desde: new Date(experiencia.fecha_desde),
+            fecha_hasta: new Date(experiencia.fecha_hasta),
+          };
+        }),
         competencias: (body.competencias as number[]) || [],
         idiomas: (body.idiomas as number[]) || [],
       },
@@ -239,6 +332,11 @@ export const FormularioCandidato = () => {
   };
 
   const onSubmit = (data: IFormularioCandidato) => {
+    if (data.persona_id) {
+      updateCandidato(data);
+      return;
+    }
+
     createCandidato(data);
   };
 
@@ -550,10 +648,11 @@ export const FormularioCandidato = () => {
                 }}
                 onClick={() =>
                   appendCapacitacion({
+                    capacitacion_id: 0,
                     descripcion: '',
                     nivel: '',
-                    fecha_desde: new Date(''),
-                    fecha_hasta: new Date(''),
+                    fecha_desde: '',
+                    fecha_hasta: '',
                     institucion: '',
                   })
                 }
@@ -678,10 +777,11 @@ export const FormularioCandidato = () => {
                 }}
                 onClick={() =>
                   appendExperiencia({
+                    experiencia_id: 0,
                     empresa: '',
                     puesto_ocupado: '',
-                    fecha_desde: new Date(''),
-                    fecha_hasta: new Date(''),
+                    fecha_desde: '',
+                    fecha_hasta: '',
                     salario: 0,
                   })
                 }
@@ -716,7 +816,7 @@ export const FormularioCandidato = () => {
                 color="success"
                 fullWidth
                 loadingPosition="start"
-                loading={isFetching || isLoading}
+                loading={isFetching || isLoadingCrear || isLoadingActualizar}
                 type="submit"
                 startIcon={<SaveIcon />}
                 variant="contained"

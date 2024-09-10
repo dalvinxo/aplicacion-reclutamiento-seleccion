@@ -6,6 +6,7 @@ import {
   EnumRoles,
   EnumStatusCandidato,
   ICreatePerson,
+  IUpdatePerson,
   PayloadJwt,
   RequestCustom,
 } from "../types";
@@ -166,14 +167,253 @@ router.post(
         },
       });
 
-      await prisma.usuarioPersona.create({
-        data: {
-          usuario_id: auth.usuario_id,
-          persona_id: personaCandidato.id_persona,
+      const userPerson = await prisma.usuarioPersona.findFirst({
+        where: {
+          AND: [
+            { usuario_id: auth.usuario_id },
+            { persona_id: personaCandidato.id_persona },
+          ],
         },
       });
 
+      if (!userPerson) {
+        await prisma.usuarioPersona.create({
+          data: {
+            usuario_id: auth.usuario_id,
+            persona_id: personaCandidato.id_persona,
+          },
+        });
+      }
+
       res.status(EnumHttpCode.CREATED).json(personaCandidato);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.patch(
+  "/detalles/:persona_id",
+  authorize([EnumRoles.CANDIDATE]),
+  async (req, res, next) => {
+    const { puesto_aspirado_id, salario_aspirado, recomendado_por, persona } =
+      req.body;
+
+    const persona_id = Number(req.params.persona_id);
+
+    const {
+      cedula,
+      nombre,
+      competencias = [],
+      capacitaciones = [],
+      experienciaLaboral = [],
+      idiomas = [],
+    } = persona as IUpdatePerson;
+
+    try {
+      const candidato = await prisma.candidato.findFirst({
+        where: {
+          AND: [
+            { persona_id: persona_id },
+            { puesto_aspirado_id: puesto_aspirado_id },
+          ],
+        },
+      });
+
+      if (!candidato) {
+        await prisma.candidato.create({
+          data: {
+            puesto_aspirado_id: puesto_aspirado_id,
+            salario_aspirado: salario_aspirado,
+            recomendado_por: recomendado_por,
+            persona_id: persona_id,
+            estado_candidato_id: EnumStatusCandidato.POSTULADO,
+          },
+        });
+      } else {
+        await prisma.candidato.update({
+          where: { id_candidato: candidato.id_candidato },
+          data: {
+            puesto_aspirado_id: puesto_aspirado_id,
+            salario_aspirado: salario_aspirado,
+            recomendado_por: recomendado_por,
+          },
+        });
+      }
+
+      const capacitacionesActuales = await prisma.capacitacion.findMany({
+        where: { persona_id: persona_id },
+        select: { id_capacitacion: true },
+      });
+
+      const capacitacionesActualesIds = capacitacionesActuales.map(
+        (c) => c.id_capacitacion
+      );
+
+      // Identificar las capacitaciones a eliminar
+      const capacitacionesAEliminar = capacitacionesActualesIds.filter(
+        (capacitacion_id) =>
+          !capacitaciones.some((c) => c.capacitacion_id === capacitacion_id)
+      );
+
+      // Identificar las capacitaciones a agregar
+      const capacitacionesAAgregar = capacitaciones.filter(
+        (capacitacion) =>
+          !capacitacionesActualesIds.includes(capacitacion.capacitacion_id)
+      );
+
+      // Eliminar capacitaciones
+      if (capacitacionesAEliminar.length > 0) {
+        await prisma.capacitacion.deleteMany({
+          where: {
+            persona_id: persona_id,
+            id_capacitacion: { in: capacitacionesAEliminar },
+          },
+        });
+      }
+
+      // Agregar nuevas capacitaciones
+      if (capacitacionesAAgregar.length > 0) {
+        const nuevasCapacitaciones = capacitacionesAAgregar.map(
+          (capacitacion) => ({
+            persona_id: persona_id,
+            ...capacitacion, // Añadir los datos de la nueva capacitación
+          })
+        );
+
+        await prisma.capacitacion.createMany({
+          data: nuevasCapacitaciones,
+        });
+      }
+
+      const experienciasActuales = await prisma.experienciaLaboral.findMany({
+        where: { persona_id: persona_id },
+        select: { id_experiencia_laboral: true },
+      });
+
+      const experienciasActualesIds = experienciasActuales.map(
+        (e) => e.id_experiencia_laboral
+      );
+
+      const experienciasAEliminar = experienciasActualesIds.filter(
+        (experiencia_id) =>
+          !experienciaLaboral.some(
+            (e) => e.id_experiencia_laboral === experiencia_id
+          )
+      );
+
+      const experienciasAAgregar = experienciaLaboral.filter(
+        (experiencia) =>
+          !experienciasActualesIds.includes(experiencia.id_experiencia_laboral)
+      );
+
+      if (experienciasAEliminar.length > 0) {
+        await prisma.experienciaLaboral.deleteMany({
+          where: {
+            persona_id: persona_id,
+            id_experiencia_laboral: { in: experienciasAEliminar },
+          },
+        });
+      }
+
+      if (experienciasAAgregar.length > 0) {
+        const nuevasExperiencias = experienciasAAgregar.map((experiencia) => {
+          const { id_experiencia_laboral, ...nuevaExperiencia } = experiencia;
+          return {
+            persona_id: persona_id,
+            ...nuevaExperiencia,
+          };
+        });
+
+        await prisma.experienciaLaboral.createMany({
+          data: nuevasExperiencias,
+        });
+      }
+
+      const competenciasActuales = await prisma.personaCompetencia.findMany({
+        where: { persona_id: persona_id },
+        select: { competencia_id: true },
+      });
+
+      const competenciasActualesIds = competenciasActuales.map(
+        (c) => c.competencia_id
+      );
+
+      const competenciasAEliminar = competenciasActualesIds.filter(
+        (competencia_id) => !competencias.includes(competencia_id)
+      );
+
+      const competenciasAAgregar = competencias.filter(
+        (competencia_id: number) =>
+          !competenciasActualesIds.includes(competencia_id)
+      );
+
+      if (competenciasAEliminar.length > 0) {
+        await prisma.personaCompetencia.deleteMany({
+          where: {
+            persona_id: persona_id,
+            competencia_id: { in: competenciasAEliminar },
+          },
+        });
+      }
+
+      if (competenciasAAgregar.length > 0) {
+        const nuevasCompetencias = competenciasAAgregar.map(
+          (competencia_id: number) => ({
+            persona_id: persona_id,
+            competencia_id,
+          })
+        );
+        await prisma.personaCompetencia.createMany({
+          data: nuevasCompetencias,
+        });
+      }
+
+      const idiomasActuales = await prisma.personaIdioma.findMany({
+        where: { persona_id: persona_id },
+        select: { idioma_id: true },
+      });
+
+      const idiomasActualesIds = idiomasActuales.map((i) => i.idioma_id);
+
+      const idiomasAEliminar = idiomasActualesIds.filter(
+        (idioma_id) => !idiomas.includes(idioma_id)
+      );
+
+      const idiomasAAgregar = idiomas.filter(
+        (idioma_id: number) => !idiomasActualesIds.includes(idioma_id)
+      );
+
+      if (idiomasAEliminar.length > 0) {
+        await prisma.personaIdioma.deleteMany({
+          where: {
+            persona_id: persona_id,
+            idioma_id: { in: idiomasAEliminar },
+          },
+        });
+      }
+
+      if (idiomasAAgregar.length > 0) {
+        const nuevosIdiomas = idiomasAAgregar.map((idioma_id: number) => ({
+          persona_id: persona_id,
+          idioma_id,
+        }));
+        await prisma.personaIdioma.createMany({
+          data: nuevosIdiomas,
+        });
+      }
+
+      const personaDb = await prisma.persona.update({
+        where: {
+          id_persona: persona_id,
+        },
+        data: {
+          cedula: cedula,
+          nombre: nombre,
+        },
+      });
+
+      res.json(personaDb);
     } catch (error) {
       next(error);
     }

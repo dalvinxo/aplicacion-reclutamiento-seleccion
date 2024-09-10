@@ -56,6 +56,32 @@ export interface ICreatePerson {
   experienciaLaboral?: IExperienciaLaboral[];
 }
 
+interface ICapacitacionUpdate extends ICapacitaciones {
+  capacitacion_id: number;
+}
+
+interface IExperienciaLaboralUpdate extends IExperienciaLaboral {
+  id_experiencia_laboral: number;
+}
+
+export interface IUpdatePerson {
+  cedula: string;
+  nombre: string;
+  idiomas?: number[];
+  competencias?: number[];
+  capacitaciones?: ICapacitacionUpdate[];
+  experienciaLaboral?: IExperienciaLaboralUpdate[];
+}
+
+export interface IUpdateCandidato {
+  puesto_aspirado_id: number;
+  departamento_id: number;
+  salario_aspirado: number;
+  recomendado_por: string;
+  estado_candidato_id: number;
+  persona: IUpdatePerson;
+}
+
 export interface ICreateCandidato {
   puesto_aspirado_id: number;
   departamento_id: number;

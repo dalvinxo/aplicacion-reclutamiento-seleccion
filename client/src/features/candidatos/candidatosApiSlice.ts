@@ -1,6 +1,11 @@
 import { apiSlice } from '../../services/apiSlice';
 import { endpoints } from '../../services/endpoints';
-import { ICreateCandidato, IPerson } from './candidatosTypes';
+import {
+  ICreateCandidato,
+  IPerson,
+  IUpdateCandidato,
+  IUpdatePerson,
+} from './candidatosTypes';
 
 export const puestosApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -11,7 +16,18 @@ export const puestosApiSlice = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    updateCandidato: builder.mutation<
+      IPerson,
+      IUpdateCandidato & { persona_id: number }
+    >({
+      query: ({ persona_id, ...body }) => ({
+        url: endpoints.candidatos.update(persona_id),
+        method: 'PATCH',
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useCreateCandidatoMutation } = puestosApiSlice;
+export const { useCreateCandidatoMutation, useUpdateCandidatoMutation } =
+  puestosApiSlice;

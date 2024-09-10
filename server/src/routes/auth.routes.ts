@@ -192,4 +192,63 @@ router.get(
   }
 );
 
+router.get(
+  "/user-person",
+  authorize([EnumRoles.USER, EnumRoles.ADMIN, EnumRoles.CANDIDATE]),
+  async (req, res, next) => {
+    try {
+      const auth = (req as RequestCustom<PayloadJwt>).user;
+
+      const userId = Number(auth.usuario_id);
+
+      const userPerson = await prisma.usuarioPersona.findFirst({
+        where: {
+          usuario_id: userId,
+        },
+        include: {
+          Persona: {
+            include: {
+              Capacitacion: true,
+              ExperienciaLaboral: true,
+              PersonaCompetencia: true,
+              PersonaIdioma: true,
+              Candidato: true,
+            },
+          },
+        },
+      });
+
+      if (!userPerson) {
+        res
+          .status(404)
+          .json({ message: "Usuario no tiene información registrada" });
+        return;
+      }
+
+      const { Persona } = userPerson;
+
+      const userFilter = {
+        puesto_aspirado_id: Persona.Candidato[0].puesto_aspirado_id,
+        recomendado_por: Persona.Candidato[0].recomendado_por,
+        salario_aspirado: Persona.Candidato[0].salario_aspirado,
+        persona: {
+          persona_id: Persona.id_persona,
+          nombre: Persona.nombre,
+          cedula: Persona.cedula,
+          idioma: Persona.PersonaIdioma.map((idioma) => idioma.idioma_id),
+          competencia: Persona.PersonaCompetencia.map(
+            (competencia) => competencia.competencia_id
+          ),
+          capacitaciones: Persona.Capacitacion,
+          experienciaLaboral: Persona.ExperienciaLaboral,
+        },
+      };
+
+      res.json(userFilter);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 export default router;

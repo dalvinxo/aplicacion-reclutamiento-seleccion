@@ -4,6 +4,7 @@ export const endpoints = {
     signup: 'auth/sign-up',
     logout: 'auth/logout',
     user: 'auth/user',
+    userPerson: 'auth/user-person',
   },
   puestos: {
     getAll: (pages: number = 1, limit = 10) =>
@@ -17,6 +18,7 @@ export const endpoints = {
   },
   candidatos: {
     create: `candidatos/detalles`,
+    update: (id: number) => `candidatos/detalles/${id}`,
   },
   competencias: {
     getAll: (pages: number = 1, limit = 10) =>
