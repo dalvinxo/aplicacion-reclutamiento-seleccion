@@ -4,7 +4,6 @@ import {
   ICreateCandidato,
   IPerson,
   IUpdateCandidato,
-  IUpdatePerson,
 } from './candidatosTypes';
 
 export const puestosApiSlice = apiSlice.injectEndpoints({

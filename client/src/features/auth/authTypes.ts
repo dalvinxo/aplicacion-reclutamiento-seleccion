@@ -45,6 +45,16 @@ export interface UserPersonCandidate {
   salario_aspirado: number;
 }
 
+export interface PuestoUser {
+  estado: boolean;
+  estatus: string;
+  id_candidato: number;
+  persona_id: number;
+  puesto_aspirado_id: number;
+  recomendado_por: string;
+  salario_aspirado: number;
+}
+
 export interface PersonaUserCandidate {
   capacitaciones: CapacitacioneCandidate[];
   cedula: string;

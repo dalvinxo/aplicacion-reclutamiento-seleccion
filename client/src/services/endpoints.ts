@@ -5,6 +5,7 @@ export const endpoints = {
     logout: 'auth/logout',
     user: 'auth/user',
     userPerson: 'auth/user-person',
+    userCandidate: (id: number) => `auth/${id}`,
   },
   puestos: {
     getAll: (pages: number = 1, limit = 10) =>

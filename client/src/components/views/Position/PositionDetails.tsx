@@ -13,6 +13,7 @@ import { Link, useParams } from 'react-router-dom';
 import { useGetPuestoDetailsByIdQuery } from '../../../features/puestos/puestosApiSlice';
 import RadioButtonCheckedOutlinedIcon from '@mui/icons-material/RadioButtonCheckedOutlined';
 import { SkeletonLoading } from '../../commons/SkeletonLoading';
+import { useGetPuestoUserQuery } from '../../../features/auth/authApiSlice';
 
 export const PositionDetails = () => {
   const { puesto_id } = useParams();
@@ -24,6 +25,12 @@ export const PositionDetails = () => {
   const { data, isLoading, isSuccess } = useGetPuestoDetailsByIdQuery(
     parseInt(puesto_id)
   );
+
+  const {
+    data: dataCandidate,
+    isLoading: isLoadingCandidate,
+    isSuccess: isSuccessCandidate,
+  } = useGetPuestoUserQuery(parseInt(puesto_id));
 
   return (
     <>
@@ -102,14 +109,30 @@ export const PositionDetails = () => {
         />
       </Grid>
 
+      {isSuccessCandidate && (
+        <>
+          <Grid size={12} marginTop={'1rem'}>
+            Estado: &nbsp;
+            <Chip
+              label={`${dataCandidate.estatus}`}
+              color="default"
+              sx={{
+                fontWeight: 'bold',
+                fontSize: '1rem',
+              }}
+            />
+          </Grid>
+        </>
+      )}
+
       <Link to="crear-candidato" style={{ textDecoration: 'none' }}>
         <Button
           variant="outlined"
-          color="success"
+          color={isSuccessCandidate ? 'warning' : 'success'}
           size="medium"
           sx={{ marginTop: '3rem', minWidth: 200 }}
         >
-          Aplicar
+          {isSuccessCandidate ? 'Editar datos' : 'Aplicar'}
         </Button>
       </Link>
     </>

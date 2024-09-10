@@ -250,19 +250,16 @@ router.patch(
         (c) => c.id_capacitacion
       );
 
-      // Identificar las capacitaciones a eliminar
       const capacitacionesAEliminar = capacitacionesActualesIds.filter(
         (capacitacion_id) =>
           !capacitaciones.some((c) => c.capacitacion_id === capacitacion_id)
       );
 
-      // Identificar las capacitaciones a agregar
       const capacitacionesAAgregar = capacitaciones.filter(
         (capacitacion) =>
           !capacitacionesActualesIds.includes(capacitacion.capacitacion_id)
       );
 
-      // Eliminar capacitaciones
       if (capacitacionesAEliminar.length > 0) {
         await prisma.capacitacion.deleteMany({
           where: {
@@ -272,12 +269,11 @@ router.patch(
         });
       }
 
-      // Agregar nuevas capacitaciones
       if (capacitacionesAAgregar.length > 0) {
         const nuevasCapacitaciones = capacitacionesAAgregar.map(
           (capacitacion) => ({
             persona_id: persona_id,
-            ...capacitacion, // Añadir los datos de la nueva capacitación
+            ...capacitacion,
           })
         );
 

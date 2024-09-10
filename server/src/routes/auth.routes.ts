@@ -251,4 +251,56 @@ router.get(
   }
 );
 
+router.get(
+  "/:puestoId",
+  authorize([EnumRoles.ADMIN, EnumRoles.USER, EnumRoles.CANDIDATE]),
+  async (req, res, next) => {
+    const puesto_id = Number(req.params.puestoId);
+
+    const auth = (req as RequestCustom<PayloadJwt>).user;
+
+    const userId = Number(auth.usuario_id);
+
+    try {
+      const persona = await prisma.usuarioPersona.findFirst({
+        where: {
+          usuario_id: userId,
+        },
+      });
+
+      if (!persona) {
+        res
+          .status(EnumHttpCode.NOT_FOUND)
+          .json("El candidato no fue encontrado");
+        return;
+      }
+
+      const candidatos = await prisma.candidato.findFirst({
+        where: {
+          AND: [
+            { puesto_aspirado_id: puesto_id },
+            { persona_id: persona.persona_id },
+          ],
+        },
+        include: {
+          EstadoCandidato: true,
+        },
+      });
+
+      if (!candidatos) {
+        res
+          .status(EnumHttpCode.NOT_FOUND)
+          .json("El candidato no fue encontrado");
+        return;
+      }
+
+      const { EstadoCandidato, estado_candidato_id, ...candidato } = candidatos;
+
+      res.json({ ...candidato, estatus: EstadoCandidato.descripcion });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 export default router;

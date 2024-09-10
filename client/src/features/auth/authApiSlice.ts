@@ -1,6 +1,11 @@
 import { apiSlice } from '../../services/apiSlice';
 import { endpoints } from '../../services/endpoints';
-import { AuthUser, UserPersonCandidate, UserSimple } from './authTypes';
+import {
+  AuthUser,
+  PuestoUser,
+  UserPersonCandidate,
+  UserSimple,
+} from './authTypes';
 
 export const authApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -33,12 +38,16 @@ export const authApiSlice = apiSlice.injectEndpoints({
     getCandidateUser: builder.query<UserPersonCandidate, void>({
       query: () => endpoints.auth.userPerson,
     }),
+    getPuestoUser: builder.query<PuestoUser, number>({
+      query: (id) => endpoints.auth.userCandidate(id),
+    }),
   }),
 });
 
 export const {
   useGetUserQuery,
   useLazyGetCandidateUserQuery,
+  useGetPuestoUserQuery,
   useLoginMutation,
   useSignupMutation,
   useLogoutMutation,
