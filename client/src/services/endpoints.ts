@@ -7,6 +7,17 @@ export const endpoints = {
     userPerson: 'auth/user-person',
     userCandidate: (id: number) => `auth/${id}`,
   },
+  empleados: {
+    getAll: (pages: number = 1, limit = 10) =>
+      `empleados?page=${pages}&limit=${limit}`,
+    getAllFilter: (
+      pages: number = 1,
+      limit = 10,
+      desde?: string,
+      hasta?: string
+    ) =>
+      `empleados/filtrar?page=${pages}&limit=${limit}${desde == undefined ? '' : '&desde=' + desde}${hasta == undefined ? '' : '&hasta=' + hasta}`,
+  },
   puestos: {
     getAll: (pages: number = 1, limit = 10) =>
       `puestos?page=${pages}&limit=${limit}`,

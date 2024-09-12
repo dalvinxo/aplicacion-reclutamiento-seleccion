@@ -26,7 +26,7 @@ import { useGetAllEmpleadosFilterQuery } from '../../../../features/empleados/em
 import { Empleado } from '../../../../features/empleados/empleadosTypes';
 import moment from 'moment';
 
-export const ListadoEmpleados = () => {
+export const ListadoCandidatos = () => {
   const [page, setPage] = useState<number>(1);
   const [itemsPorPagina, setItemsPorPagina] = useState<number>(5);
   const [desde, setDesde] = useState<string | null>(null);

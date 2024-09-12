@@ -101,7 +101,7 @@ export const AppBarMenu = () => {
                 <MenuItem
                   onClick={handleMenuClose}
                   component={Link}
-                  to="/mantenimiento"
+                  to="/mantenimiento/competencias"
                   sx={{
                     display:
                       user.rol_id != EnumRoles.CANDIDATE ? 'block' : 'none',

@@ -34,6 +34,8 @@ import { NuevoPuesto } from './components/views/Maintenance/Puestos/NuevoPuesto'
 import { EditarPuesto } from './components/views/Maintenance/Puestos/EditarPuesto';
 import { Signup } from './components/views/Signup/Signup';
 import { LayoutAccess } from './components/layouts/LayoutAccess';
+import { ListadoEmpleados } from './components/views/Maintenance/Empleados/ListadoEmpleados';
+import { Empleados } from './components/views/Maintenance/Empleados/Empleados';
 
 const router = createBrowserRouter([
   {
@@ -146,6 +148,16 @@ const router = createBrowserRouter([
                   {
                     path: 'editar-puesto/:id',
                     element: <EditarPuesto />,
+                  },
+                ],
+              },
+              {
+                path: 'empleados',
+                element: <Empleados />,
+                children: [
+                  {
+                    index: true,
+                    element: <ListadoEmpleados />,
                   },
                 ],
               },
