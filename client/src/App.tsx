@@ -36,6 +36,7 @@ import { Signup } from './components/views/Signup/Signup';
 import { LayoutAccess } from './components/layouts/LayoutAccess';
 import { ListadoEmpleados } from './components/views/Maintenance/Empleados/ListadoEmpleados';
 import { Empleados } from './components/views/Maintenance/Empleados/Empleados';
+import { ListCandidate } from './components/views/Position/ListCandidate';
 
 const router = createBrowserRouter([
   {
@@ -75,6 +76,10 @@ const router = createBrowserRouter([
           {
             path: ':puesto_id/crear-candidato',
             element: <CreateCandidate />,
+          },
+          {
+            path: ':puesto_id/list-candidato',
+            element: <ListCandidate />,
           },
           {
             path: 'cerrar-sesion',

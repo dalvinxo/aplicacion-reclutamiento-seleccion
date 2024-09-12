@@ -14,6 +14,9 @@ import { useGetPuestoDetailsByIdQuery } from '../../../features/puestos/puestosA
 import RadioButtonCheckedOutlinedIcon from '@mui/icons-material/RadioButtonCheckedOutlined';
 import { SkeletonLoading } from '../../commons/SkeletonLoading';
 import { useGetPuestoUserQuery } from '../../../features/auth/authApiSlice';
+import { useAppSelector } from '../../../store/hook';
+import { selectCurrentUser } from '../../../features/auth/authSlice';
+import { EnumRoles } from '../../../features/auth/authTypes';
 
 export const PositionDetails = () => {
   const { puesto_id } = useParams();
@@ -21,6 +24,8 @@ export const PositionDetails = () => {
   if (!puesto_id || isNaN(parseInt(puesto_id))) {
     return <div>Not Found</div>;
   }
+
+  const auth = useAppSelector(selectCurrentUser);
 
   const { data, isLoading, isSuccess } = useGetPuestoDetailsByIdQuery(
     parseInt(puesto_id)
@@ -125,16 +130,31 @@ export const PositionDetails = () => {
         </>
       )}
 
-      <Link to="crear-candidato" style={{ textDecoration: 'none' }}>
-        <Button
-          variant="outlined"
-          color={isSuccessCandidate ? 'warning' : 'success'}
-          size="medium"
-          sx={{ marginTop: '3rem', minWidth: 200 }}
-        >
-          {isSuccessCandidate ? 'Editar datos' : 'Aplicar'}
-        </Button>
-      </Link>
+      {auth?.rol_id != EnumRoles.CANDIDATE && (data?._count || 0) > 0 && (
+        <Link to="list-candidato" style={{ textDecoration: 'none' }}>
+          <Button
+            variant="outlined"
+            color={'secondary'}
+            size="medium"
+            sx={{ marginTop: '3rem', minWidth: 200 }}
+          >
+            Ver Listado de candidatos
+          </Button>
+        </Link>
+      )}
+
+      {auth?.rol_id == EnumRoles.CANDIDATE && (
+        <Link to="crear-candidato" style={{ textDecoration: 'none' }}>
+          <Button
+            variant="outlined"
+            color={isSuccessCandidate ? 'warning' : 'success'}
+            size="medium"
+            sx={{ marginTop: '3rem', minWidth: 200 }}
+          >
+            {isSuccessCandidate ? 'Editar datos' : 'Aplicar'}
+          </Button>
+        </Link>
+      )}
     </>
   );
 };
