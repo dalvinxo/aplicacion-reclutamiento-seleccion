@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography } from '@mui/material';
+import { Badge, Card, CardContent, Chip, Typography } from '@mui/material';
 import { PuestoVacante } from '../../../features/puestos/puestosTypes';
 
 interface IPuestoCard {
@@ -7,22 +7,23 @@ interface IPuestoCard {
 
 export const PuestoCard = ({ puesto }: IPuestoCard) => {
   return (
-    <Card variant="outlined">
+    <Card variant="outlined" sx={{ height: '100%' }}>
       <CardContent>
-        <Typography variant="h5" component="div">
-          {puesto.nombre}
-        </Typography>
-        <Typography color="text.secondary">
-          Departamento: {puesto.Departamento.nombre}
-        </Typography>
-        <Typography variant="body2">{puesto.descripcion}</Typography>
-        <Typography variant="body2">
-          Nivel de Riesgo: {puesto.nivel_riesgo}
-        </Typography>
-        <Typography variant="body2">
-          Salario: ${puesto.nivel_minimo_salario} - $
-          {puesto.nivel_maximo_salario}
-        </Typography>
+        {puesto.nombre && <div>{puesto.nombre}</div>}
+        {puesto.Departamento?.nombre && (
+          <div>Departamento: {puesto.Departamento.nombre}</div>
+        )}
+        {puesto.descripcion && <div>{puesto.descripcion}</div>}
+        {puesto.nivel_riesgo && (
+          <div>Nivel de Riesgo: {puesto.nivel_riesgo}</div>
+        )}
+        {puesto.nivel_minimo_salario && puesto.nivel_maximo_salario && (
+          <div>
+            Salario: ${puesto.nivel_minimo_salario} - $
+            {puesto.nivel_maximo_salario}
+          </div>
+        )}
+        <div>Candidatos: {puesto.candidatos}</div>
       </CardContent>
     </Card>
   );

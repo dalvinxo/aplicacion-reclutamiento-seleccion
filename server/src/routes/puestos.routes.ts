@@ -66,6 +66,7 @@ router.get("/vacantes", async (req, res, next) => {
     const puestos = await prisma.puesto.findMany({
       skip: skip,
       take: take,
+
       where: {
         estado: true,
       },
@@ -73,6 +74,7 @@ router.get("/vacantes", async (req, res, next) => {
         id_puesto: "desc",
       },
       include: {
+        _count: true,
         Departamento: {
           select: {
             id_departamento: true,
@@ -91,8 +93,8 @@ router.get("/vacantes", async (req, res, next) => {
     const totalPages = Math.ceil(totalPuestos / take);
 
     const puestosPages = puestos.map((puesto) => {
-      const { departamento_id, estado, ...puestoFilter } = puesto;
-      return puestoFilter;
+      const { departamento_id, estado, _count, ...puestoFilter } = puesto;
+      return { ...puestoFilter, candidatos: _count.Candidato };
     });
 
     res.json({

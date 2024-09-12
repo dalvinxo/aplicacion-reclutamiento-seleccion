@@ -34,6 +34,7 @@ export interface Puesto extends Omit<RootPuesto, 'departamento_id'> {
 
 export type PuestoVacante = Omit<Puesto, 'estado' | 'departamento'> & {
   Departamento: Departamento;
+  candidatos: number;
 };
 
 export interface PuestoDetails extends PuestoVacante {

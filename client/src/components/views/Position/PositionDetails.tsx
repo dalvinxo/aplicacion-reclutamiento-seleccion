@@ -130,7 +130,20 @@ export const PositionDetails = () => {
         </>
       )}
 
-      {auth?.rol_id != EnumRoles.CANDIDATE && (data?._count || 0) > 0 && (
+      {!auth && (
+        <Link to="crear-candidato" style={{ textDecoration: 'none' }}>
+          <Button
+            variant="outlined"
+            color={isSuccessCandidate ? 'warning' : 'success'}
+            size="medium"
+            sx={{ marginTop: '3rem', minWidth: 200 }}
+          >
+            {isSuccessCandidate ? 'Editar datos' : 'Aplicar'}
+          </Button>
+        </Link>
+      )}
+
+      {auth?.rol_id == EnumRoles.USER && (data?._count || 0) > 0 && (
         <Link to="list-candidato" style={{ textDecoration: 'none' }}>
           <Button
             variant="outlined"
