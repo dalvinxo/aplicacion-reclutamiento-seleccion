@@ -117,13 +117,16 @@ export const ListadoCandidatos = () => {
                 onChange={(e) => setHasta(e.target.value)}
                 InputLabelProps={{ shrink: true }}
               />
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleFilter}
-              >
-                Generar reporte
-              </Button>
+
+              {data && data.empleados.length > 0 && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleFilter}
+                >
+                  Generar reporte
+                </Button>
+              )}
             </Box>
 
             <TableContainer component={Paper}>

@@ -16,7 +16,7 @@ export const endpoints = {
       desde?: string,
       hasta?: string
     ) =>
-      `empleados/filtrar?page=${pages}&limit=${limit}${desde == undefined ? '' : '&desde=' + desde}${hasta == undefined ? '' : '&hasta=' + hasta}`,
+      `empleados/filtrar?page=${pages}&limit=${limit}${!!desde ? '&desde=' + desde : ''}${!!hasta ? '&hasta=' + hasta : ''}`,
   },
   puestos: {
     getAll: (pages: number = 1, limit = 10) =>

@@ -124,14 +124,15 @@ export const ListadoEmpleados = () => {
               {/* <Button variant="contained" onClick={() => refetch()}>
                 Filtrar
               </Button> */}
-
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handleReporte}
-              >
-                Generar reporte
-              </Button>
+              {data && data.empleados.length > 0 && (
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={handleReporte}
+                >
+                  Generar reporte
+                </Button>
+              )}
             </Box>
 
             <TableContainer component={Paper}>
