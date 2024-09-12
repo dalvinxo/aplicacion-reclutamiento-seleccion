@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Chip,
-  IconButton,
   Pagination,
   Paper,
   Table,
@@ -15,16 +14,13 @@ import {
   TextField,
 } from '@mui/material';
 
-import EditIcon from '@mui/icons-material/Edit';
-import ToggleOnIcon from '@mui/icons-material/ToggleOn';
-import ToggleOffIcon from '@mui/icons-material/ToggleOff';
-
 import { SkeletonLoading } from '../../../commons/SkeletonLoading';
-import { Link } from 'react-router-dom';
-import { enqueueSnackbar } from 'notistack';
 import { useGetAllEmpleadosFilterQuery } from '../../../../features/empleados/empleadosApiSlice';
 import { Empleado } from '../../../../features/empleados/empleadosTypes';
 import moment from 'moment';
+import { pdf, PDFDownloadLink } from '@react-pdf/renderer';
+import { saveAs } from 'file-saver';
+import { ReporteEmpleados } from './ReporteEmpleados';
 
 export const ListadoEmpleados = () => {
   const [page, setPage] = useState<number>(1);
@@ -93,7 +89,15 @@ export const ListadoEmpleados = () => {
     setPage(value);
   };
 
-  const handleFilter = () => {};
+  const handleReporte = async () => {
+    if (!data || !data.empleados) return;
+
+    const blob = await pdf(
+      <ReporteEmpleados empleados={data.empleados} />
+    ).toBlob();
+
+    saveAs(blob, 'reporte_empleados.pdf');
+  };
 
   return (
     <>
@@ -117,10 +121,14 @@ export const ListadoEmpleados = () => {
                 onChange={(e) => setHasta(e.target.value)}
                 InputLabelProps={{ shrink: true }}
               />
+              {/* <Button variant="contained" onClick={() => refetch()}>
+                Filtrar
+              </Button> */}
+
               <Button
                 variant="outlined"
                 color="secondary"
-                onClick={handleFilter}
+                onClick={handleReporte}
               >
                 Generar reporte
               </Button>

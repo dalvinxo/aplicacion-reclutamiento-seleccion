@@ -42,6 +42,16 @@ export const Sidebar = () => {
       </ListItemButton>
       <ListItemButton
         component={Link}
+        to={'/mantenimiento/candidatos'}
+        selected={location.pathname.includes('/mantenimiento/candidatos')}
+      >
+        <ListItemIcon>
+          <FolderIcon />
+        </ListItemIcon>
+        <ListItemText primary="Candidatos" />
+      </ListItemButton>
+      <ListItemButton
+        component={Link}
         to={'/mantenimiento/empleados'}
         selected={location.pathname.includes('/mantenimiento/empleados')}
       >
