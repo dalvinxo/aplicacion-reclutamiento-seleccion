@@ -6,16 +6,20 @@ export interface Puestos extends IPagination {
   puestos: Puesto[];
 }
 
-// export interface PostPuesto {
-//   nombre: string;
-//   descripcion: string;
-//   nivel_riesgo: string;
-//   nivel_minimo_salario: number;
-//   nivel_maximo_salario: number;
-//   departamento_id: number;
-//   competencias: number[];
-//   idiomas: number[];
-// }
+export interface IPuestoCandidatos extends IPagination {
+  candidatos_puestos: IRootPuestoCandidato[];
+}
+
+export interface IRootPuestoCandidato {
+  id_candidato: number;
+  cedula: string;
+  estado: boolean;
+  estado_candidato: string;
+  estado_candidato_id: number;
+  nombre: string;
+  recomendado_por: string;
+  salario_aspirado: number;
+}
 
 export interface RootPuesto {
   id_puesto: number;

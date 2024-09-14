@@ -23,6 +23,8 @@ export const endpoints = {
       `puestos?page=${pages}&limit=${limit}`,
     getAllVacantes: (pages: number = 1, limit = 10) =>
       `puestos/vacantes?page=${pages}&limit=${limit}`,
+    getAllCandidatos: (puesto_id: number, pages: number = 1, limit = 10) =>
+      `puestos/${puesto_id}/candidatos?page=${pages}&limit=${limit}`,
     getOne: (id: number) => `puestos/${id}`,
     getOneDetails: (id: number) => `puestos/${id}/competenciasYIdiomas`,
     update: (id: number) => `puestos/${id}`,
@@ -31,6 +33,7 @@ export const endpoints = {
   candidatos: {
     create: `candidatos/detalles`,
     update: (id: number) => `candidatos/detalles/${id}`,
+    getOneDetails: (id: number) => `candidatos/${id}/details`,
   },
   competencias: {
     getAll: (pages: number = 1, limit = 10) =>

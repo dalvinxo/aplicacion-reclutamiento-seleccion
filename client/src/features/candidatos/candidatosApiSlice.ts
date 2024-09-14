@@ -1,10 +1,7 @@
 import { apiSlice } from '../../services/apiSlice';
 import { endpoints } from '../../services/endpoints';
-import {
-  ICreateCandidato,
-  IPerson,
-  IUpdateCandidato,
-} from './candidatosTypes';
+import { UserPersonCandidate } from '../auth/authTypes';
+import { ICreateCandidato, IPerson, IUpdateCandidato } from './candidatosTypes';
 
 export const puestosApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -25,8 +22,14 @@ export const puestosApiSlice = apiSlice.injectEndpoints({
         body,
       }),
     }),
+    getCandidateById: builder.query<UserPersonCandidate, number>({
+      query: (id) => endpoints.candidatos.getOneDetails(id),
+    }),
   }),
 });
 
-export const { useCreateCandidatoMutation, useUpdateCandidatoMutation } =
-  puestosApiSlice;
+export const {
+  useLazyGetCandidateByIdQuery,
+  useCreateCandidatoMutation,
+  useUpdateCandidatoMutation,
+} = puestosApiSlice;

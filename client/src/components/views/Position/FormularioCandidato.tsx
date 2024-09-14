@@ -821,7 +821,7 @@ export const FormularioCandidato = () => {
                 startIcon={<SaveIcon />}
                 variant="contained"
               >
-                Postular
+                Guardar
               </LoadingButton>
             </Grid>
           </Grid>

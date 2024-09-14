@@ -2,6 +2,7 @@ import { IFormularioPuesto } from '../../components/views/Maintenance/Puestos/Fo
 import { apiSlice } from '../../services/apiSlice';
 import { endpoints } from '../../services/endpoints';
 import {
+  IPuestoCandidatos,
   PuestoDetails,
   PuestoIdiomaCompetencia,
   Puestos,
@@ -20,6 +21,13 @@ export const puestosApiSlice = apiSlice.injectEndpoints({
           endpoints.puestos.getAllVacantes(pages, limit),
       }
     ),
+    getAllCandidatosPuesto: builder.query<
+      IPuestoCandidatos,
+      { puesto_id: number; pages?: number; limit?: number }
+    >({
+      query: ({ puesto_id, pages, limit }) =>
+        endpoints.puestos.getAllCandidatos(puesto_id, pages, limit),
+    }),
     getOnePuestoById: builder.query<PuestoIdiomaCompetencia, number>({
       query: (id) => endpoints.puestos.getOne(id),
     }),
@@ -52,6 +60,7 @@ export const {
   useGetAllPuestosQuery,
   useGetAllVacantesQuery,
   useGetPuestoDetailsByIdQuery,
+  useGetAllCandidatosPuestoQuery,
   useLazyGetOnePuestoByIdQuery,
   useUpdatePuestoMutation,
   useCreatePuestoMutation,

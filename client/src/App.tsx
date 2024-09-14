@@ -1,10 +1,11 @@
+import CssBaseline from '@mui/material/CssBaseline';
+
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Layout } from './components/layouts/Layout';
 import { blue, grey } from '@mui/material/colors';
 import { ThemeProvider } from '@mui/material';
 import { useThemeContext } from './context/ThemeContext';
 
-import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import createTheme from '@mui/material/styles/createTheme';
 

@@ -73,6 +73,57 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+router.get("/:id/details", async (req, res, next) => {
+  try {
+    const candidato = await prisma.candidato.findUnique({
+      where: {
+        id_candidato: Number(req.params.id),
+      },
+      include: {
+        Persona: {
+          include: {
+            Capacitacion: true,
+            ExperienciaLaboral: true,
+            PersonaCompetencia: true,
+            PersonaIdioma: true,
+            Candidato: true,
+          },
+        },
+      },
+    });
+
+    if (!candidato) {
+      res
+        .status(EnumHttpCode.NOT_FOUND)
+        .json({ message: "El candidato no existe" });
+      return;
+    }
+
+    const { Persona } = candidato;
+
+    const userFilter = {
+      puesto_aspirado_id: Persona.Candidato[0].puesto_aspirado_id,
+      recomendado_por: Persona.Candidato[0].recomendado_por,
+      salario_aspirado: Persona.Candidato[0].salario_aspirado,
+      persona: {
+        persona_id: Persona.id_persona,
+        nombre: Persona.nombre,
+        cedula: Persona.cedula,
+        idioma: Persona.PersonaIdioma.map((idioma) => idioma.idioma_id),
+        competencia: Persona.PersonaCompetencia.map(
+          (competencia) => competencia.competencia_id
+        ),
+        capacitaciones: Persona.Capacitacion,
+        experienciaLaboral: Persona.ExperienciaLaboral,
+      },
+    };
+
+    res.json(userFilter);
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.delete("/:id", async (req, res, next) => {
   try {
     await prisma.candidato.delete({

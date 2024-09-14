@@ -234,6 +234,81 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+router.get("/:id/candidatos", async (req, res, next) => {
+  const { page, limit } = req.query;
+
+  const pages = Number(page || 1);
+  const limits = Number(limit || 10);
+
+  const skip = (pages - 1) * limits;
+  const take = limits;
+
+  try {
+    const puesto = await prisma.puesto.findUnique({
+      where: {
+        id_puesto: Number(req.params.id),
+      },
+      select: {
+        _count: true,
+        Candidato: {
+          skip: skip,
+          take: take,
+          select: {
+            id_candidato: true,
+            salario_aspirado: true,
+            estado: true,
+            estado_candidato_id: true,
+            Persona: {
+              select: {
+                nombre: true,
+                cedula: true,
+              },
+            },
+            EstadoCandidato: {
+              select: {
+                descripcion: true,
+              },
+            },
+            recomendado_por: true,
+          },
+        },
+      },
+    });
+
+    if (!puesto) {
+      res
+        .status(EnumHttpCode.NOT_FOUND)
+        .json({ message: "El puesto no existe" });
+      return;
+    }
+
+    const { Candidato, _count } = puesto;
+
+    const candidatos_puestos = Candidato.map((postulante) => {
+      const { Persona, EstadoCandidato, ...candidato } = postulante;
+
+      return {
+        ...candidato,
+        nombre: Persona.nombre,
+        cedula: Persona.cedula,
+        estado_candidato: EstadoCandidato.descripcion,
+      };
+    });
+
+    const totalPages = Math.ceil(_count.Candidato / take);
+
+    res.json({
+      page: pages,
+      limit: limits,
+      totalPages: totalPages,
+      total: _count.Candidato,
+      candidatos_puestos,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
   try {
     const puesto = await prisma.puesto.findUnique({

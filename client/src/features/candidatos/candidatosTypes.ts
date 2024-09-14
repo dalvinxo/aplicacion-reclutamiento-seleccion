@@ -60,3 +60,8 @@ export interface IPerson {
   id_persona: number;
   nombre: string;
 }
+
+export enum EnumStatusCandidato {
+  POSTULADO = 1,
+  CONTRADO = 2,
+}

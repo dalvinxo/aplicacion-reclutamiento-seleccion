@@ -39,6 +39,7 @@ declare global {
     maxWidth?: number;
     align?: 'left' | 'center' | 'right' | 'justify' | 'inherit' | undefined;
     formatBool?: (value: boolean) => string;
+    formatNumber?: (value: number) => string;
     formatDate?: (value: string) => string;
   }
 }
