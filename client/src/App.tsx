@@ -40,6 +40,7 @@ import { Empleados } from './components/views/Maintenance/Empleados/Empleados';
 import { ListCandidate } from './components/views/Position/ListCandidate';
 import { Candidatos } from './components/views/Maintenance/Candidatos/Candidatos';
 import { ListadoCandidatos } from './components/views/Maintenance/Candidatos/ListadoCandidatos';
+import { Charts } from './components/views/Maintenance/Charts';
 
 const router = createBrowserRouter([
   {
@@ -103,7 +104,7 @@ const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <h2>Seleccionar una opcion</h2>,
+                element: <Charts />,
               },
               {
                 path: 'competencias',
