@@ -34,6 +34,7 @@ export const endpoints = {
     create: `candidatos/detalles`,
     update: (id: number) => `candidatos/detalles/${id}`,
     getOneDetails: (id: number) => `candidatos/${id}/details`,
+    contratar: (id: number) => `candidatos/${id}/contratar`,
   },
   competencias: {
     getAll: (pages: number = 1, limit = 10) =>

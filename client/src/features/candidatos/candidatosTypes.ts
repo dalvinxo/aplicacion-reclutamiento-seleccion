@@ -61,6 +61,22 @@ export interface IPerson {
   nombre: string;
 }
 
+export interface ICandidatoContrato {
+  id_empleado: number;
+  persona_id: number;
+  fecha_ingreso: string;
+  puesto_id: number;
+  salario_mensual: number;
+  estado: boolean;
+  fecha_creacion: string;
+  Persona: {
+    id_persona: number;
+    cedula: string;
+    nombre: string;
+    estado: boolean;
+  };
+}
+
 export enum EnumStatusCandidato {
   POSTULADO = 1,
   CONTRADO = 2,

@@ -468,9 +468,11 @@ router.patch(
 );
 
 router.patch("/:id/contratar", async (req, res, next) => {
-  try {
-    const { fecha_ingreso, salario_mensual } = req.body;
+  const { fecha_ingreso, salario_mensual } = req.body;
 
+  const id_candidato = req.params.id;
+
+  try {
     if (!fecha_ingreso || !salario_mensual) {
       res
         .status(EnumHttpCode.BAD_REQUEST)
@@ -482,7 +484,7 @@ router.patch("/:id/contratar", async (req, res, next) => {
     const result = await prisma.$transaction(async (prisma) => {
       const candidato = await prisma.candidato.update({
         where: {
-          id_candidato: Number(req.params.id),
+          id_candidato: Number(id_candidato),
         },
         data: {
           estado_candidato_id: EnumStatusCandidato.CONTRADO,
@@ -493,7 +495,7 @@ router.patch("/:id/contratar", async (req, res, next) => {
       const empleado = await prisma.empleado.create({
         data: {
           fecha_ingreso,
-          salario_mensual,
+          salario_mensual: parseFloat(salario_mensual),
           persona_id: candidato.persona_id,
           puesto_id: candidato.puesto_aspirado_id,
         },

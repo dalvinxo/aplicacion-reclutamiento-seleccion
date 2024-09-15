@@ -253,6 +253,9 @@ router.get("/:id/candidatos", async (req, res, next) => {
         Candidato: {
           skip: skip,
           take: take,
+          where: {
+            estado: true,
+          },
           select: {
             id_candidato: true,
             salario_aspirado: true,

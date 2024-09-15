@@ -12,7 +12,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   Divider,
   IconButton,
@@ -24,6 +23,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
 import { useGetAllCandidatosPuestoQuery } from '../../../features/puestos/puestosApiSlice';
@@ -31,9 +31,32 @@ import { IRootPuestoCandidato } from '../../../features/puestos/puestosTypes';
 import { useState } from 'react';
 import { EnumStatusCandidato } from '../../../features/candidatos/candidatosTypes';
 import { SkeletonLoading } from '../../commons/SkeletonLoading';
-import { useLazyGetCandidateByIdQuery } from '../../../features/candidatos/candidatosApiSlice';
+import {
+  useContratarCandidatoMutation,
+  useLazyGetCandidateByIdQuery,
+} from '../../../features/candidatos/candidatosApiSlice';
 import { UserPersonCandidate } from '../../../features/auth/authTypes';
 import moment from 'moment';
+import * as yup from 'yup';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { enqueueSnackbar } from 'notistack';
+import { SpinnerCircularProgress } from '../../commons/SpinnerCircularProgress';
+
+const formContratoCandidatoSchema = yup.object().shape({
+  fecha_ingreso: yup
+    .date()
+    .required('La fecha desde es requerida.')
+    .typeError('La fecha desde es invalida.')
+    .min(new Date(), 'La fecha no puede ser anterior a hoy.'),
+  salario_mensual: yup
+    .number()
+    .required('El salario al que aspira es requerido.')
+    .min(1, 'El salario al que aspira debe ser un valor positivo.'),
+});
+
+export interface IFormularioContrato
+  extends yup.InferType<typeof formContratoCandidatoSchema> {}
 
 export const ListCandidate = () => {
   const { puesto_id } = useParams();
@@ -41,6 +64,8 @@ export const ListCandidate = () => {
   if (!puesto_id || isNaN(parseInt(puesto_id))) {
     return <div>Not Found</div>;
   }
+
+  const [candidatoId, setCandidatoId] = useState<number | null>(null);
 
   const [page, setPage] = useState<number>(1);
   const [candidateDetails, setCandidateDetails] =
@@ -50,7 +75,7 @@ export const ListCandidate = () => {
     setPage(value);
   };
 
-  const { data, isLoading } = useGetAllCandidatosPuestoQuery(
+  const { data, isLoading, refetch } = useGetAllCandidatosPuestoQuery(
     {
       puesto_id: parseInt(puesto_id),
       pages: page,
@@ -60,6 +85,9 @@ export const ListCandidate = () => {
       refetchOnMountOrArgChange: true,
     }
   );
+
+  const [contratarCandidato, { isLoading: isLoadingContrato }] =
+    useContratarCandidatoMutation();
 
   const [consultarCandidate, { isLoading: isLoadingCandidate }] =
     useLazyGetCandidateByIdQuery();
@@ -78,7 +106,7 @@ export const ListCandidate = () => {
     {
       id: 'cedula',
       headerName: 'Cédula',
-      minWidth: 80,
+      minWidth: 60,
     },
     {
       id: 'nombre',
@@ -87,8 +115,8 @@ export const ListCandidate = () => {
     },
     {
       id: 'salario_aspirado',
-      headerName: 'Salario Aspirado',
-      minWidth: 100,
+      headerName: 'Salario Aspirado ($)',
+      minWidth: 80,
     },
     {
       id: 'recomendado_por',
@@ -98,7 +126,7 @@ export const ListCandidate = () => {
     {
       id: 'estado_candidato_id',
       headerName: 'Estado',
-      minWidth: 100,
+      minWidth: 50,
       formatNumber(value) {
         return value === EnumStatusCandidato.POSTULADO
           ? 'Pendiente'
@@ -117,7 +145,59 @@ export const ListCandidate = () => {
   };
 
   const handleContractCandidate = (candidato_id: number) => {
-    console.log('contractar');
+    setCandidatoId(candidato_id);
+  };
+
+  const {
+    register,
+    reset,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormularioContrato>({
+    resolver: yupResolver(formContratoCandidatoSchema),
+    defaultValues: {
+      salario_mensual: 0,
+      fecha_ingreso: new Date(''),
+    },
+    resetOptions: {
+      keepIsSubmitSuccessful: true,
+      keepIsSubmitted: false,
+    },
+  });
+
+  const onSubmit = async (data: IFormularioContrato) => {
+    if (!candidatoId) {
+      enqueueSnackbar(`No se reconoce el candidato a contratar`, {
+        variant: 'error',
+      });
+      return;
+    }
+
+    await contratarCandidato({
+      candidateo_id: candidatoId,
+      salario_mensual: data.salario_mensual.toString(),
+      fecha_ingreso: data.fecha_ingreso,
+    })
+      .unwrap()
+      .then((response) => {
+        enqueueSnackbar(
+          `${response.Persona.nombre} ya es parte de la empresa`,
+          {
+            variant: 'success',
+          }
+        );
+
+        reset();
+        refetch();
+        setCandidatoId(null);
+      })
+      .catch((error: IException) => {
+        enqueueSnackbar(`${error.data.message}`, {
+          variant: 'error',
+        });
+      });
+
+    reset();
   };
 
   return (
@@ -265,6 +345,7 @@ export const ListCandidate = () => {
           </>
         </Grid>
       </Grid>
+
       <Dialog
         fullWidth={true}
         maxWidth={'md'}
@@ -284,7 +365,7 @@ export const ListCandidate = () => {
               Cédula: {candidateDetails?.persona.cedula}
             </Typography>
             <Typography variant="body2" color="textSecondary">
-              Puesto Aspirado: {candidateDetails?.puesto_aspirado_id}
+              Puesto Aspirado: $ {candidateDetails?.puesto_aspirado_id}
             </Typography>
             <Typography variant="body2" color="textSecondary">
               Salario Aspirado: {candidateDetails?.salario_aspirado}
@@ -301,7 +382,11 @@ export const ListCandidate = () => {
           </Typography>
           {candidateDetails?.persona.experienciaLaboral.map(
             (experiencia, index) => (
-              <Paper elevation={2} sx={{ padding: '1rem' }} key={index}>
+              <Paper
+                elevation={2}
+                sx={{ padding: '1rem', margin: '1rem 0 1rem 0' }}
+                key={index}
+              >
                 <Typography variant="body1" gutterBottom>
                   Empresa: {experiencia.empresa}
                 </Typography>
@@ -335,7 +420,11 @@ export const ListCandidate = () => {
           </Typography>
           {candidateDetails?.persona.capacitaciones.map(
             (capacitacion, index) => (
-              <Paper elevation={2} sx={{ padding: '1rem' }} key={index}>
+              <Paper
+                elevation={2}
+                sx={{ padding: '1rem', margin: '1rem 0 1rem 0' }}
+                key={index}
+              >
                 <Typography variant="body1" gutterBottom>
                   {capacitacion.descripcion}
                 </Typography>
@@ -366,11 +455,71 @@ export const ListCandidate = () => {
               setCandidateDetails(null);
             }}
             color="error"
-            variant="contained"
+            variant="outlined"
           >
             Cerrar
           </Button>
         </DialogActions>
+      </Dialog>
+
+      <Dialog
+        fullWidth={true}
+        maxWidth={'sm'}
+        open={!!candidatoId}
+        onClose={() => {
+          setCandidatoId(null);
+        }}
+      >
+        <DialogTitle>Contratar Candidato</DialogTitle>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogContent dividers={true}>
+            <Grid container spacing={2}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  fullWidth
+                  label="Fecha de ingreso"
+                  type="date"
+                  {...register('fecha_ingreso')}
+                  error={!!errors.fecha_ingreso}
+                  helperText={errors.fecha_ingreso?.message}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <TextField
+                  label="Salario mensual"
+                  type="number"
+                  fullWidth
+                  {...register('salario_mensual')}
+                  error={!!errors.salario_mensual}
+                  helperText={errors.salario_mensual?.message}
+                />
+              </Grid>
+            </Grid>
+          </DialogContent>
+          <DialogActions>
+            {isLoadingContrato && <SpinnerCircularProgress />}
+
+            <Button
+              color="success"
+              type="submit"
+              variant="outlined"
+              disabled={isLoadingContrato}
+            >
+              Contratar
+            </Button>
+
+            <Button
+              onClick={() => {
+                setCandidatoId(null);
+              }}
+              color="error"
+              variant="outlined"
+            >
+              Cerrar
+            </Button>
+          </DialogActions>
+        </form>
       </Dialog>
     </>
   );
