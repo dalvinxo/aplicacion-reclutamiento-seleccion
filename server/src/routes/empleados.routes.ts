@@ -2,6 +2,7 @@ import express from "express";
 
 import { prisma } from "../libs/prisma";
 import { EnumHttpCode } from "../types";
+import { isValidDateParam } from "../utils/validation.utils";
 
 const router = express.Router();
 
@@ -98,12 +99,6 @@ router.get("/filtrar", async (req, res, next) => {
   const today = new Date();
 
   try {
-    // Helper para verificar que es un string
-    const isValidDateParam = (param: unknown): param is string => {
-      return typeof param === "string";
-    };
-
-    // Validar que los parámetros sean strings
     if (hasta && !isValidDateParam(desde)) {
       res.status(400).json({
         error: "Debe proporcionar la fecha 'desde' si se incluye 'hasta'.",

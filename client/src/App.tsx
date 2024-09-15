@@ -38,6 +38,8 @@ import { LayoutAccess } from './components/layouts/LayoutAccess';
 import { ListadoEmpleados } from './components/views/Maintenance/Empleados/ListadoEmpleados';
 import { Empleados } from './components/views/Maintenance/Empleados/Empleados';
 import { ListCandidate } from './components/views/Position/ListCandidate';
+import { Candidatos } from './components/views/Maintenance/Candidatos/Candidatos';
+import { ListadoCandidatos } from './components/views/Maintenance/Candidatos/ListadoCandidatos';
 
 const router = createBrowserRouter([
   {
@@ -164,6 +166,16 @@ const router = createBrowserRouter([
                   {
                     index: true,
                     element: <ListadoEmpleados />,
+                  },
+                ],
+              },
+              {
+                path: 'candidatos',
+                element: <Candidatos />,
+                children: [
+                  {
+                    index: true,
+                    element: <ListadoCandidatos />,
                   },
                 ],
               },

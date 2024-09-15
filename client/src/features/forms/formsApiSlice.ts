@@ -1,6 +1,10 @@
 import { apiSlice } from '../../services/apiSlice';
 import { endpoints } from '../../services/endpoints';
-import { FormCrearCandidato, FormCrearPuesto } from './formsTypes';
+import {
+  FormCrearCandidato,
+  FormCrearPuesto,
+  FormSearchCandidato,
+} from './formsTypes';
 
 export const formsApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -10,8 +14,14 @@ export const formsApiSlice = apiSlice.injectEndpoints({
     getFormCrearPuestos: builder.query<FormCrearPuesto, void>({
       query: () => endpoints.form.getFormCrearPuesto,
     }),
+    getFormFilterCandidatos: builder.query<FormSearchCandidato, void>({
+      query: () => endpoints.form.getFormSearchCandidato,
+    }),
   }),
 });
 
-export const { useGetFormCrearCandidatosQuery, useGetFormCrearPuestosQuery } =
-  formsApiSlice;
+export const {
+  useGetFormCrearCandidatosQuery,
+  useGetFormCrearPuestosQuery,
+  useGetFormFilterCandidatosQuery,
+} = formsApiSlice;

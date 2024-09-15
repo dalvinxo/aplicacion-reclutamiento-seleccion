@@ -52,3 +52,7 @@ export const validationCedula: (cedula: string) => boolean = (cedula) => {
 
   return digitoVerificador === cedulaNumeros[10];
 };
+
+export const isValidDateParam = (param: unknown): param is string => {
+  return typeof param === "string";
+};

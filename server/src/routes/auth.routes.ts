@@ -168,6 +168,7 @@ router.get(
           empleado_id: true,
           ultimo_login: true,
           id_usuario: true,
+          email: true,
           Empleado: {
             select: {
               Puesto: {

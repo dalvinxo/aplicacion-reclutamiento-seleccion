@@ -7,6 +7,15 @@ export interface FormCrearPuesto extends FormCrearCandidato {
   departamentos: DepartamentoForm[];
 }
 
+export interface FormSearchCandidato extends FormCrearPuesto {
+  puestos: PuestosForm[];
+}
+
+export interface PuestosForm {
+  id_puesto: number;
+  nombre: string;
+}
+
 export interface CompetenciaForm {
   descripcion: string;
   id_competencia: number;

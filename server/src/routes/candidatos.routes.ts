@@ -28,6 +28,189 @@ router.get(
   }
 );
 
+router.get(
+  "/filtrar",
+  authorize([EnumRoles.ADMIN, EnumRoles.USER]),
+  async (req, res, next) => {
+    const {
+      page,
+      limit,
+      puesto_id,
+      competencia_id,
+      idioma_id,
+      nivel_capacitacion,
+    } = req.query;
+
+    const pages = Number(page || 1);
+    const limits = Number(limit || 10);
+    const skip = (pages - 1) * limits;
+    const take = limits;
+
+    const whereCondition: any = {};
+
+    if (puesto_id) {
+      whereCondition.puesto_aspirado_id = Number(puesto_id);
+    }
+
+    if (competencia_id) {
+      whereCondition.Persona = {
+        ...whereCondition.Persona,
+        PersonaCompetencia: {
+          some: {
+            competencia_id: Number(competencia_id),
+          },
+        },
+      };
+    }
+
+    if (idioma_id) {
+      whereCondition.Persona = {
+        ...whereCondition.Persona,
+        PersonaIdioma: {
+          some: {
+            idioma_id: Number(idioma_id),
+          },
+        },
+      };
+    }
+
+    if (!!nivel_capacitacion) {
+      console.log("entro a la capacitacion", !!nivel_capacitacion);
+      whereCondition.Persona = {
+        ...whereCondition.Persona,
+        Capacitacion: {
+          some: {
+            nivel: nivel_capacitacion,
+          },
+        },
+      };
+    }
+
+    try {
+      const candidatos = await prisma.candidato.findMany({
+        skip: skip,
+        take: take,
+        where: Object.keys(whereCondition).length ? whereCondition : {},
+        select: {
+          id_candidato: true,
+          puesto_aspirado_id: true,
+          salario_aspirado: true,
+          estado: true,
+          estado_candidato_id: true,
+          Persona: {
+            select: {
+              nombre: true,
+              cedula: true,
+            },
+          },
+          Puesto: {
+            select: {
+              nombre: true,
+              Departamento: {
+                select: {
+                  nombre: true,
+                },
+              },
+            },
+          },
+          EstadoCandidato: {
+            select: {
+              descripcion: true,
+            },
+          },
+          recomendado_por: true,
+        },
+      });
+
+      // const candidatos = await prisma.candidato.findMany({
+      //   skip: skip,
+      //   take: take,
+      //   where: {
+      //     // estado: true,
+      //     // puesto_aspirado_id: puesto_id ? Number(puesto_id) : undefined,
+      //     // Persona: {
+      //     //   PersonaCompetencia: competencia_id
+      //     //     ? {
+      //     //         some: {
+      //     //           competencia_id: Number(competencia_id),
+      //     //         },
+      //     //       }
+      //     //     : undefined,
+      //     //   PersonaIdioma: idioma_id
+      //     //     ? {
+      //     //         some: {
+      //     //           idioma_id: Number(idioma_id),
+      //     //         },
+      //     //       }
+      //     //     : undefined,
+      //     //   Capacitacion: nivelCapacitacionString
+      //     //     ? {
+      //     //         some: {
+      //     //           nivel: nivelCapacitacionString,
+      //     //         },
+      //     //       }
+      //     //     : undefined,
+      //     // },
+      //   },
+      //   select: {
+      //     id_candidato: true,
+      //     salario_aspirado: true,
+      //     estado: true,
+      //     estado_candidato_id: true,
+      //     Persona: {
+      //       select: {
+      //         nombre: true,
+      //         cedula: true,
+      //       },
+      //     },
+      //     Puesto: {
+      //       select: {
+      //         nombre: true,
+      //         Departamento: {
+      //           select: {
+      //             nombre: true,
+      //           },
+      //         },
+      //       },
+      //     },
+      //     EstadoCandidato: {
+      //       select: {
+      //         descripcion: true,
+      //       },
+      //     },
+      //     recomendado_por: true,
+      //   },
+      // });
+
+      const totalCandidatos = await prisma.candidato.count();
+      const totalPages = Math.ceil(totalCandidatos / take);
+
+      const candidatosFilter = candidatos.map((candidato) => {
+        const { Persona, Puesto, EstadoCandidato, ...data } = candidato;
+
+        return {
+          ...data,
+          nombre: Persona.nombre,
+          cedula: Persona.cedula,
+          puesto: Puesto.nombre,
+          candidato_estado: EstadoCandidato.descripcion,
+          departamento: Puesto.Departamento.nombre,
+        };
+      });
+
+      res.json({
+        page: pages,
+        limit: limits,
+        totalPages: totalPages,
+        total: totalCandidatos,
+        candidatos: candidatosFilter,
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 router.post("/", async (req, res, next) => {
   try {
     const candidatos = await prisma.candidato.create({
