@@ -1,5 +1,5 @@
 import Grid from '@mui/material/Grid2';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import { BreadcrumbsCommons } from '../../commons/BreadcrumbsCommons';
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -62,7 +62,7 @@ export const ListCandidate = () => {
   const { puesto_id } = useParams();
 
   if (!puesto_id || isNaN(parseInt(puesto_id))) {
-    return <div>Not Found</div>;
+    return <Navigate to={'/server/not-found/404'} replace={true} />;
   }
 
   const [candidatoId, setCandidatoId] = useState<number | null>(null);
@@ -75,7 +75,7 @@ export const ListCandidate = () => {
     setPage(value);
   };
 
-  const { data, isLoading, refetch } = useGetAllCandidatosPuestoQuery(
+  const { data, isLoading, refetch, isError } = useGetAllCandidatosPuestoQuery(
     {
       puesto_id: parseInt(puesto_id),
       pages: page,
@@ -199,6 +199,10 @@ export const ListCandidate = () => {
 
     reset();
   };
+
+  if (isError) {
+    return <Navigate to={'/server/not-found/404'} replace={true} />;
+  }
 
   return (
     <>

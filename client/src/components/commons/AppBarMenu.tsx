@@ -11,7 +11,7 @@ import {
   Divider,
   Avatar,
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 import { useState } from 'react';
 import { useThemeContext } from '../../context/ThemeContext';
@@ -25,6 +25,8 @@ import { EnumRoles } from '../../features/auth/authTypes';
 
 export const AppBarMenu = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const navigate = useNavigate();
 
   const { toggleTheme } = useThemeContext();
 
@@ -55,7 +57,14 @@ export const AppBarMenu = () => {
         }}
       >
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            onClick={() => {
+              navigate('/');
+            }}
+            variant="h6"
+            component="div"
+            sx={{ flexGrow: 1 }}
+          >
             RT-UNAPEC
           </Typography>
 

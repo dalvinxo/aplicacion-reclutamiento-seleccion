@@ -41,6 +41,7 @@ import { ListCandidate } from './components/views/Position/ListCandidate';
 import { Candidatos } from './components/views/Maintenance/Candidatos/Candidatos';
 import { ListadoCandidatos } from './components/views/Maintenance/Candidatos/ListadoCandidatos';
 import { Charts } from './components/views/Maintenance/Charts';
+import ServerError500 from './ServerError500';
 import NotFound404 from './NotFound404';
 
 const router = createBrowserRouter([
@@ -188,6 +189,10 @@ const router = createBrowserRouter([
       {
         path: '*',
         element: <NotFound404 />,
+      },
+      {
+        path: 'server/internal-error/500',
+        element: <ServerError500 />,
       },
     ],
   },
