@@ -7,7 +7,17 @@ interface IPuestoCard {
 
 export const PuestoCard = ({ puesto }: IPuestoCard) => {
   return (
-    <Card variant="outlined" sx={{ height: '100%' }}>
+    <Card
+      variant="outlined"
+      sx={{
+        height: '100%',
+        '&:hover': {
+          boxShadow: 6,
+          transform: 'scale(1.01)',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+        },
+      }}
+    >
       <CardContent>
         {puesto.nombre && <div>{puesto.nombre}</div>}
         {puesto.Departamento?.nombre && (

@@ -184,7 +184,7 @@ export const ListadoCandidatos = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell align="center" colSpan={7}>
-                      Empleados
+                      Candidatos
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -214,7 +214,6 @@ export const ListadoCandidatos = () => {
                           }
 
                           const value = candidato[column.id];
-
                           return (
                             <TableCell key={column.id} align={column.align}>
                               {column.formatBool &&
@@ -226,6 +225,15 @@ export const ListadoCandidatos = () => {
                               ) : column.formatDate &&
                                 typeof value === 'string' ? (
                                 column.formatDate(value)
+                              ) : column.id == 'candidato_estado' ? (
+                                <Chip
+                                  label={value}
+                                  color={
+                                    value == 'Pendiente'
+                                      ? 'secondary'
+                                      : 'primary'
+                                  }
+                                />
                               ) : (
                                 value
                               )}

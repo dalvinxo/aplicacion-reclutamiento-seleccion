@@ -13,7 +13,7 @@ export const Sidebar = () => {
       <ListItemButton
         component={Link}
         to={'/mantenimiento'}
-        selected={location.pathname.includes('/mantenimiento')}
+        selected={location.pathname == '/mantenimiento'}
       >
         <ListItemIcon>
           <FolderIcon />
