@@ -18,7 +18,7 @@ import { SkeletonLoading } from '../../../commons/SkeletonLoading';
 import { useGetAllEmpleadosFilterQuery } from '../../../../features/empleados/empleadosApiSlice';
 import { Empleado } from '../../../../features/empleados/empleadosTypes';
 import moment from 'moment';
-import { pdf, PDFDownloadLink } from '@react-pdf/renderer';
+import { pdf } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 import { ReporteEmpleados } from './ReporteEmpleados';
 

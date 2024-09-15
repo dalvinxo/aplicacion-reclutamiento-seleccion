@@ -81,3 +81,21 @@ export enum EnumStatusCandidato {
   POSTULADO = 1,
   CONTRADO = 2,
 }
+
+export interface CandidatosFilters extends IPagination {
+  candidatos: CandidatosPostulados[];
+}
+
+export interface CandidatosPostulados {
+  candidato_estado: string;
+  cedula: string;
+  departamento: string;
+  estado: boolean;
+  estado_candidato_id: number;
+  id_candidato: number;
+  nombre: string;
+  puesto: string;
+  puesto_aspirado_id: number;
+  recomendado_por: string;
+  salario_aspirado: number;
+}

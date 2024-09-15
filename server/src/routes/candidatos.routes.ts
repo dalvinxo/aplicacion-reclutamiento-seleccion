@@ -36,6 +36,7 @@ router.get(
       page,
       limit,
       puesto_id,
+      departamento_id,
       competencia_id,
       idioma_id,
       nivel_capacitacion,
@@ -58,6 +59,17 @@ router.get(
         PersonaCompetencia: {
           some: {
             competencia_id: Number(competencia_id),
+          },
+        },
+      };
+    }
+
+    if (departamento_id) {
+      whereCondition.Persona = {
+        ...whereCondition.Persona,
+        Puesto: {
+          Puesto: {
+            departamento_id: departamento_id,
           },
         },
       };

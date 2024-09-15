@@ -35,6 +35,15 @@ export const endpoints = {
     update: (id: number) => `candidatos/detalles/${id}`,
     getOneDetails: (id: number) => `candidatos/${id}/details`,
     contratar: (id: number) => `candidatos/${id}/contratar`,
+    getAllFilter: (
+      pages: number = 1,
+      limit = 10,
+      puesto_id?: number,
+      competencia_id?: number,
+      idioma_id?: number,
+      nivel_capacitacion?: string
+    ) =>
+      `candidatos/filtrar?page=${pages}&limit=${limit}${!!competencia_id ? '&competencia_id=' + competencia_id : ''}${!!idioma_id ? '&idioma_id=' + idioma_id : ''}${!!puesto_id ? '&puesto_id=' + puesto_id : ''}${!!nivel_capacitacion ? '&nivel_capacitacion=' + nivel_capacitacion : ''}`,
   },
   competencias: {
     getAll: (pages: number = 1, limit = 10) =>

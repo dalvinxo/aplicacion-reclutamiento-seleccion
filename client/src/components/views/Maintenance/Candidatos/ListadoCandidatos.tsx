@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import {
   Box,
-  Button,
   Chip,
   IconButton,
+  MenuItem,
   Pagination,
   Paper,
   Table,
@@ -15,29 +15,30 @@ import {
   TextField,
 } from '@mui/material';
 
-import EditIcon from '@mui/icons-material/Edit';
-import ToggleOnIcon from '@mui/icons-material/ToggleOn';
-import ToggleOffIcon from '@mui/icons-material/ToggleOff';
-
 import { SkeletonLoading } from '../../../commons/SkeletonLoading';
-import { Link } from 'react-router-dom';
-import { enqueueSnackbar } from 'notistack';
-import { useGetAllEmpleadosFilterQuery } from '../../../../features/empleados/empleadosApiSlice';
-import { Empleado } from '../../../../features/empleados/empleadosTypes';
-import moment from 'moment';
+import { useGetFormFilterCandidatosQuery } from '../../../../features/forms/formsApiSlice';
+import { useGetAllCandidatosFilterQuery } from '../../../../features/candidatos/candidatosApiSlice';
+import { CandidatosPostulados } from '../../../../features/candidatos/candidatosTypes';
+
+import CleaningServicesIcon from '@mui/icons-material/CleaningServices';
 
 export const ListadoCandidatos = () => {
   const [page, setPage] = useState<number>(1);
   const [itemsPorPagina, setItemsPorPagina] = useState<number>(5);
-  const [desde, setDesde] = useState<string | null>(null);
-  const [hasta, setHasta] = useState<string | null>(null);
 
-  const { data, isLoading } = useGetAllEmpleadosFilterQuery(
+  const [competenciaId, setCompetenciaId] = useState<number>();
+  const [idiomaId, setIdiomaId] = useState<number>();
+  const [puestoId, setPuestoId] = useState<number>();
+  const [nivel, setNivel] = useState<string>();
+
+  const { data, isLoading } = useGetAllCandidatosFilterQuery(
     {
       pages: page,
       limit: itemsPorPagina,
-      desde: desde ?? undefined,
-      hasta: hasta ?? undefined,
+      competencia_id: competenciaId,
+      idioma_id: idiomaId,
+      puesto_id: puestoId,
+      nivel_capacitacion: nivel,
     },
     {
       refetchOnMountOrArgChange: true,
@@ -45,15 +46,23 @@ export const ListadoCandidatos = () => {
     }
   );
 
-  const columns: IColumnBasic<keyof Empleado>[] = [
+  const { data: dataForm, isLoading: isLoadingForm } =
+    useGetFormFilterCandidatosQuery();
+
+  const columns: IColumnBasic<keyof CandidatosPostulados>[] = [
     {
-      id: 'id_empleado',
+      id: 'id_candidato',
       headerName: 'ID',
       minWidth: 30,
     },
     {
       id: 'nombre',
       headerName: 'Nombre',
+      minWidth: 100,
+    },
+    {
+      id: 'cedula',
+      headerName: 'Cédula',
       minWidth: 100,
     },
     {
@@ -67,25 +76,14 @@ export const ListadoCandidatos = () => {
       minWidth: 100,
     },
     {
-      id: 'fecha_ingreso',
-      headerName: 'Fecha de ingreso',
+      id: 'salario_aspirado',
+      headerName: 'Salario Aspirado',
       minWidth: 100,
-      formatDate: (value) => {
-        const fecha = new Date(value);
-        if (isNaN(fecha.getTime())) {
-          return '';
-        }
-
-        return value ? moment(value).format('DD/MM/YYYY') : '';
-      },
     },
     {
-      id: 'estado',
+      id: 'candidato_estado',
       headerName: 'Estado',
       minWidth: 100,
-      formatBool(value) {
-        return value ? 'Activo' : 'Inactivo';
-      },
     },
   ];
 
@@ -93,47 +91,89 @@ export const ListadoCandidatos = () => {
     setPage(value);
   };
 
-  const handleFilter = () => {};
-
   return (
     <>
-      {isLoading ? (
+      {isLoading || isLoadingForm ? (
         <SkeletonLoading />
       ) : (
         <>
           <Paper sx={{ width: '100%', overflow: 'hidden' }}>
             <Box sx={{ padding: '1rem', display: 'flex', gap: '1rem' }}>
               <TextField
-                label="Desde"
-                type="date"
-                value={desde || ''}
-                onChange={(e) => setDesde(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-              />
-              <TextField
-                label="Hasta"
-                type="date"
-                value={hasta || ''}
-                onChange={(e) => setHasta(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-              />
+                select
+                fullWidth
+                label="Idiomas"
+                defaultValue={idiomaId}
+                onChange={(e) => setIdiomaId(Number(e.target.value))}
+              >
+                {dataForm?.idiomas.map((option) => (
+                  <MenuItem key={option.id_idioma} value={option.id_idioma}>
+                    {option.nombre}
+                  </MenuItem>
+                ))}
+              </TextField>
 
-              {data && data.empleados.length > 0 && (
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={handleFilter}
-                >
-                  Generar reporte
-                </Button>
-              )}
+              <TextField select fullWidth label="Nivel" defaultValue={nivel}>
+                <MenuItem value="certificacion">Certificación</MenuItem>
+                <MenuItem value="tecnico">Técnico</MenuItem>
+                <MenuItem value="gestion">Gestión</MenuItem>
+                <MenuItem value="bachiller">Bachiller</MenuItem>
+                <MenuItem value="grado">Grado</MenuItem>
+                <MenuItem value="post-grado">Post-grado</MenuItem>
+                <MenuItem value="doctorado">Doctorado</MenuItem>
+              </TextField>
+
+              <TextField
+                select
+                fullWidth
+                label="Puestos"
+                defaultValue={puestoId}
+                onChange={(e) => setPuestoId(Number(e.target.value))}
+              >
+                {dataForm?.puestos.map((option) => (
+                  <MenuItem key={option.id_puesto} value={option.id_puesto}>
+                    {option.nombre}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                select
+                fullWidth
+                label="Competencias"
+                defaultValue={competenciaId}
+                onChange={(e) => setCompetenciaId(Number(e.target.value))}
+              >
+                {dataForm?.competencias.map((option) => (
+                  <MenuItem
+                    key={option.id_competencia}
+                    value={option.id_competencia}
+                  >
+                    {option.descripcion}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <IconButton
+                onClick={() => {
+                  setCompetenciaId(undefined);
+                  setPuestoId(undefined);
+                  setNivel(undefined);
+                  setIdiomaId(undefined);
+                }}
+                color="info"
+                aria-label="details"
+                size="small"
+              >
+                <CleaningServicesIcon />
+              </IconButton>
             </Box>
 
             <TableContainer component={Paper}>
               <Table stickyHeader aria-label="sticky table">
                 <TableHead>
                   <TableRow>
-                    <TableCell align="center" colSpan={6}>
+                    <TableCell align="center" colSpan={7}>
                       Empleados
                     </TableCell>
                   </TableRow>
@@ -151,9 +191,9 @@ export const ListadoCandidatos = () => {
                 </TableHead>
                 {data && (
                   <TableBody>
-                    {data.empleados.map((empleado) => (
+                    {data.candidatos.map((candidato) => (
                       <TableRow
-                        key={empleado.id_empleado}
+                        key={candidato.id_candidato}
                         hover
                         role="checkbox"
                         tabIndex={-1}
@@ -161,41 +201,9 @@ export const ListadoCandidatos = () => {
                         {columns.map((column) => {
                           if (column.id === 'action') {
                             return;
-                            // return (
-                            //   <TableCell key={column.id} align={column.align}>
-                            //     <IconButton
-                            //       component={Link}
-                            //       to={
-                            //         'editar-competencia/' +
-                            //         competencia.id_competencia
-                            //       }
-                            //       aria-label="edit"
-                            //       size="small"
-                            //     >
-                            //       <EditIcon />
-                            //     </IconButton>
-
-                            //     <IconButton
-                            //       onClick={() =>
-                            //         handleDelete(
-                            //           competencia.id_competencia,
-                            //           !competencia.estado
-                            //         )
-                            //       }
-                            //       aria-label="delete"
-                            //       size="small"
-                            //     >
-                            //       {competencia.estado ? (
-                            //         <ToggleOnIcon color="success" />
-                            //       ) : (
-                            //         <ToggleOffIcon color="error" />
-                            //       )}
-                            //     </IconButton>
-                            //   </TableCell>
-                            // );
                           }
 
-                          const value = empleado[column.id];
+                          const value = candidato[column.id];
 
                           return (
                             <TableCell key={column.id} align={column.align}>
@@ -232,10 +240,10 @@ export const ListadoCandidatos = () => {
             {data && (
               <Pagination
                 count={
-                  data.empleados.length < itemsPorPagina
+                  data.candidatos.length < itemsPorPagina
                     ? 1
-                    : desde || hasta
-                      ? data.empleados.length
+                    : competenciaId || idiomaId || puestoId || nivel
+                      ? data.candidatos.length
                       : data.total
                 }
                 page={page}
