@@ -26,18 +26,18 @@ export const ListadoCandidatos = () => {
   const [page, setPage] = useState<number>(1);
   const [itemsPorPagina, setItemsPorPagina] = useState<number>(5);
 
-  const [competenciaId, setCompetenciaId] = useState<number>();
-  const [idiomaId, setIdiomaId] = useState<number>();
-  const [puestoId, setPuestoId] = useState<number>();
-  const [nivel, setNivel] = useState<string>();
+  const [competenciaId, setCompetenciaId] = useState<string>('');
+  const [idiomaId, setIdiomaId] = useState<string>('');
+  const [puestoId, setPuestoId] = useState<string>('');
+  const [nivel, setNivel] = useState<string>('');
 
   const { data, isLoading } = useGetAllCandidatosFilterQuery(
     {
       pages: page,
       limit: itemsPorPagina,
-      competencia_id: competenciaId,
-      idioma_id: idiomaId,
-      puesto_id: puestoId,
+      competencia_id: Number(competenciaId),
+      idioma_id: Number(idiomaId),
+      puesto_id: Number(puestoId),
       nivel_capacitacion: nivel,
     },
     {
@@ -102,9 +102,10 @@ export const ListadoCandidatos = () => {
               <TextField
                 select
                 fullWidth
+                value={idiomaId}
                 label="Idiomas"
                 defaultValue={idiomaId}
-                onChange={(e) => setIdiomaId(Number(e.target.value))}
+                onChange={(e) => setIdiomaId(e.target.value)}
               >
                 {dataForm?.idiomas.map((option) => (
                   <MenuItem key={option.id_idioma} value={option.id_idioma}>
@@ -113,7 +114,15 @@ export const ListadoCandidatos = () => {
                 ))}
               </TextField>
 
-              <TextField select fullWidth label="Nivel" defaultValue={nivel}>
+              <TextField
+                select
+                fullWidth
+                label="Nivel"
+                value={nivel}
+                defaultValue={nivel}
+                onChange={(e) => setNivel(e.target.value)}
+              >
+                <MenuItem value=""></MenuItem>
                 <MenuItem value="certificacion">Certificación</MenuItem>
                 <MenuItem value="tecnico">Técnico</MenuItem>
                 <MenuItem value="gestion">Gestión</MenuItem>
@@ -127,8 +136,9 @@ export const ListadoCandidatos = () => {
                 select
                 fullWidth
                 label="Puestos"
+                value={puestoId}
                 defaultValue={puestoId}
-                onChange={(e) => setPuestoId(Number(e.target.value))}
+                onChange={(e) => setPuestoId(e.target.value)}
               >
                 {dataForm?.puestos.map((option) => (
                   <MenuItem key={option.id_puesto} value={option.id_puesto}>
@@ -141,8 +151,9 @@ export const ListadoCandidatos = () => {
                 select
                 fullWidth
                 label="Competencias"
+                value={competenciaId}
                 defaultValue={competenciaId}
-                onChange={(e) => setCompetenciaId(Number(e.target.value))}
+                onChange={(e) => setCompetenciaId(e.target.value)}
               >
                 {dataForm?.competencias.map((option) => (
                   <MenuItem
@@ -156,14 +167,13 @@ export const ListadoCandidatos = () => {
 
               <IconButton
                 onClick={() => {
-                  setCompetenciaId(undefined);
-                  setPuestoId(undefined);
-                  setNivel(undefined);
-                  setIdiomaId(undefined);
+                  setCompetenciaId('');
+                  setPuestoId('');
+                  setNivel('');
+                  setIdiomaId('');
                 }}
                 color="info"
                 aria-label="details"
-                size="small"
               >
                 <CleaningServicesIcon />
               </IconButton>
@@ -244,7 +254,7 @@ export const ListadoCandidatos = () => {
                     ? 1
                     : competenciaId || idiomaId || puestoId || nivel
                       ? data.candidatos.length
-                      : data.total
+                      : data.totalPages
                 }
                 page={page}
                 onChange={handleChange}

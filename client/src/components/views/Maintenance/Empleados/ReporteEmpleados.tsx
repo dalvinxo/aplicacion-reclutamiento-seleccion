@@ -1,5 +1,6 @@
 import { Page, Text, View, Document, StyleSheet } from '@react-pdf/renderer';
 import { Empleado } from '../../../../features/empleados/empleadosTypes';
+import moment from 'moment';
 
 // Define estilos para el documento PDF
 const styles = StyleSheet.create({
@@ -10,6 +11,12 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginBottom: 20,
     textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  header_secondary: {
+    fontSize: 14,
+    marginBottom: 20,
+    textAlign: 'left',
     fontWeight: 'bold',
   },
   table: {
@@ -42,10 +49,28 @@ const styles = StyleSheet.create({
   },
 });
 
-export const ReporteEmpleados = ({ empleados }: { empleados: Empleado[] }) => (
+export const ReporteEmpleados = ({
+  empleados,
+  desde,
+  hasta,
+}: {
+  empleados: Empleado[];
+  desde: string | null;
+  hasta: string | null;
+}) => (
   <Document>
     <Page size="A4" style={styles.page}>
       <Text style={styles.header}>Reporte de Empleados</Text>
+
+      <Text style={styles.header_secondary}>
+        Rango de fechas:{'\n\n'}
+        {!!desde && !!hasta
+          ? `desde: ${moment(desde).format('DD / MM / YYYY')}\nhasta: ${moment(hasta).format('DD / MM / YYYY')}`
+          : !!desde && !hasta
+            ? `desde: ${moment(desde).format('DD / MM / YYYY')}\nhasta: ${moment('').format('DD / MM / YYYY')}`
+            : `desde: ${moment('').format('DD / MM / YYYY')}\nhasta: ${moment(hasta).format('DD / MM / YYYY')}`}
+      </Text>
+
       <View style={styles.tableContainer}>
         <View style={styles.tableRow}>
           <View style={styles.tableCol}>

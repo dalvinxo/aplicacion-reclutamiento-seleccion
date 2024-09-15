@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Chip,
+  MenuItem,
   Pagination,
   Paper,
   Table,
@@ -93,7 +94,11 @@ export const ListadoEmpleados = () => {
     if (!data || !data.empleados) return;
 
     const blob = await pdf(
-      <ReporteEmpleados empleados={data.empleados} />
+      <ReporteEmpleados
+        empleados={data.empleados}
+        desde={desde}
+        hasta={hasta}
+      />
     ).toBlob();
 
     saveAs(blob, 'reporte_empleados.pdf');
@@ -121,9 +126,6 @@ export const ListadoEmpleados = () => {
                 onChange={(e) => setHasta(e.target.value)}
                 InputLabelProps={{ shrink: true }}
               />
-              {/* <Button variant="contained" onClick={() => refetch()}>
-                Filtrar
-              </Button> */}
               {data && data.empleados.length > 0 && (
                 <Button
                   variant="outlined"
@@ -167,38 +169,6 @@ export const ListadoEmpleados = () => {
                         {columns.map((column) => {
                           if (column.id === 'action') {
                             return;
-                            // return (
-                            //   <TableCell key={column.id} align={column.align}>
-                            //     <IconButton
-                            //       component={Link}
-                            //       to={
-                            //         'editar-competencia/' +
-                            //         competencia.id_competencia
-                            //       }
-                            //       aria-label="edit"
-                            //       size="small"
-                            //     >
-                            //       <EditIcon />
-                            //     </IconButton>
-
-                            //     <IconButton
-                            //       onClick={() =>
-                            //         handleDelete(
-                            //           competencia.id_competencia,
-                            //           !competencia.estado
-                            //         )
-                            //       }
-                            //       aria-label="delete"
-                            //       size="small"
-                            //     >
-                            //       {competencia.estado ? (
-                            //         <ToggleOnIcon color="success" />
-                            //       ) : (
-                            //         <ToggleOffIcon color="error" />
-                            //       )}
-                            //     </IconButton>
-                            //   </TableCell>
-                            // );
                           }
 
                           const value = empleado[column.id];
@@ -230,24 +200,44 @@ export const ListadoEmpleados = () => {
           <Box
             sx={{
               display: 'flex',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
               alignItems: 'center',
               marginTop: '1rem',
             }}
           >
             {data && (
-              <Pagination
-                count={
-                  data.empleados.length < itemsPorPagina
-                    ? 1
-                    : desde || hasta
-                      ? data.empleados.length
-                      : data.total
-                }
-                page={page}
-                onChange={handleChange}
-                color="primary"
-              />
+              <>
+                <Pagination
+                  count={
+                    data.empleados.length < itemsPorPagina
+                      ? 1
+                      : desde || hasta
+                        ? data.empleados.length
+                        : data.totalPages
+                  }
+                  page={page}
+                  onChange={handleChange}
+                  color="primary"
+                />
+
+                <TextField
+                  select
+                  fullWidth
+                  sx={{ maxWidth: '10rem' }}
+                  label="Candida de filas"
+                  defaultValue={itemsPorPagina}
+                  onChange={(e) => {
+                    setItemsPorPagina(Number(e.target.value));
+                    setPage(1);
+                  }}
+                >
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={20}>20</MenuItem>
+                  <MenuItem value={50}>50</MenuItem>
+                </TextField>
+              </>
             )}
           </Box>
         </>
