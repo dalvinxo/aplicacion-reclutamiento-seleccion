@@ -21,11 +21,14 @@ const baseQueryWithReauth: TypeBaseQuery = async (args, api, extraOptions) => {
 
         if (user) {
           await baseQuery(endpoints.auth.logout, api, extraOptions);
+          window.location.reload();
+          api.dispatch(logOut({}));
         }
       }
     }
   } catch (error) {
     console.error(error);
+    window.location.reload();
     api.dispatch(logOut({}));
   }
 

@@ -41,6 +41,7 @@ app.get("/ping", (_req, res) => {
 });
 
 app.use("/api/auth", authRouter);
+
 app.use("/api/form", formRouter);
 
 app.use("/api/puestos", puestosRouter);

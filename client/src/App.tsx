@@ -41,6 +41,7 @@ import { ListCandidate } from './components/views/Position/ListCandidate';
 import { Candidatos } from './components/views/Maintenance/Candidatos/Candidatos';
 import { ListadoCandidatos } from './components/views/Maintenance/Candidatos/ListadoCandidatos';
 import { Charts } from './components/views/Maintenance/Charts';
+import NotFound404 from './NotFound404';
 
 const router = createBrowserRouter([
   {
@@ -183,6 +184,10 @@ const router = createBrowserRouter([
             ],
           },
         ],
+      },
+      {
+        path: '*',
+        element: <NotFound404 />,
       },
     ],
   },

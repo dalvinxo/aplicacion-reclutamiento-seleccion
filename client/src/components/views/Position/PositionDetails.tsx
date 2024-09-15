@@ -9,7 +9,7 @@ import {
   ListItemText,
   Typography,
 } from '@mui/material';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { useGetPuestoDetailsByIdQuery } from '../../../features/puestos/puestosApiSlice';
 import RadioButtonCheckedOutlinedIcon from '@mui/icons-material/RadioButtonCheckedOutlined';
 import { SkeletonLoading } from '../../commons/SkeletonLoading';
@@ -22,12 +22,12 @@ export const PositionDetails = () => {
   const { puesto_id } = useParams();
 
   if (!puesto_id || isNaN(parseInt(puesto_id))) {
-    return <div>Not Found</div>;
+    return <Navigate to={'/server/not-found/404'} replace={true} />;
   }
 
   const auth = useAppSelector(selectCurrentUser);
 
-  const { data, isLoading, isSuccess } = useGetPuestoDetailsByIdQuery(
+  const { data, isLoading, isSuccess, isError } = useGetPuestoDetailsByIdQuery(
     parseInt(puesto_id)
   );
 
@@ -37,9 +37,13 @@ export const PositionDetails = () => {
     isSuccess: isSuccessCandidate,
   } = useGetPuestoUserQuery(parseInt(puesto_id));
 
+  if (isError) {
+    return <Navigate to={'/server/not-found/404'} replace={true} />;
+  }
+
   return (
     <>
-      {isLoading && <SkeletonLoading />}
+      {(isLoading || isLoadingCandidate) && <SkeletonLoading />}
 
       {isSuccess && (
         <Grid container spacing={2}>
