@@ -112,7 +112,7 @@ router.get("/filtrar", async (req, res, next) => {
     }
 
     let fechaDesde: Date | null = null;
-    let fechaHasta: Date = today;
+    let fechaHasta: Date | null = null;
 
     if (isValidDateParam(desde)) {
       fechaDesde = new Date(desde);

@@ -74,7 +74,15 @@ router.get("/vacantes", async (req, res, next) => {
         id_puesto: "desc",
       },
       include: {
-        _count: true,
+        _count: {
+          select: {
+            Candidato: {
+              where: {
+                estado: true,
+              },
+            },
+          },
+        },
         Departamento: {
           select: {
             id_departamento: true,
@@ -327,7 +335,11 @@ router.get("/:id/competenciasYIdiomas", async (req, res, next) => {
         nivel_maximo_salario: true,
         _count: {
           select: {
-            Candidato: true,
+            Candidato: {
+              where: {
+                estado: true,
+              },
+            },
           },
         },
         PuestoIdioma: {
