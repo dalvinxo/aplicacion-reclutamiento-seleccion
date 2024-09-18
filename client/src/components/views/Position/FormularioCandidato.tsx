@@ -244,16 +244,25 @@ export const FormularioCandidato = () => {
       persona: {
         nombre: body.nombre,
         cedula: body.cedula,
-        capacitaciones: body.capacitaciones.map((capacitacion) => ({
-          ...capacitacion,
-          fecha_desde: new Date(capacitacion.fecha_desde),
-          fecha_hasta: new Date(capacitacion.fecha_hasta),
-        })),
-        experienciaLaboral: body.experiencias_laborales.map((experiencia) => ({
-          ...experiencia,
-          fecha_desde: new Date(experiencia.fecha_desde),
-          fecha_hasta: new Date(experiencia.fecha_hasta),
-        })),
+        capacitaciones: body.capacitaciones.map((capacitacion) => {
+          const { fecha_desde, fecha_hasta, capacitacion_id, ...data } =
+            capacitacion;
+          return {
+            ...data,
+            fecha_desde: new Date(fecha_desde),
+            fecha_hasta: new Date(fecha_hasta),
+          };
+        }),
+        experienciaLaboral: body.experiencias_laborales.map((experiencia) => {
+          const { fecha_desde, fecha_hasta, experiencia_id, ...data } =
+            experiencia;
+
+          return {
+            ...data,
+            fecha_desde: new Date(fecha_desde),
+            fecha_hasta: new Date(fecha_hasta),
+          };
+        }),
         competencias: (body.competencias as number[]) || [],
         idiomas: (body.idiomas as number[]) || [],
       },

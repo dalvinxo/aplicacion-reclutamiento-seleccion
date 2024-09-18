@@ -28,7 +28,11 @@ export const PositionDetails = () => {
   const auth = useAppSelector(selectCurrentUser);
 
   const { data, isLoading, isSuccess, isError } = useGetPuestoDetailsByIdQuery(
-    parseInt(puesto_id)
+    parseInt(puesto_id),
+    {
+      refetchOnMountOrArgChange: true,
+      refetchOnReconnect: true,
+    }
   );
 
   const {
@@ -114,6 +118,8 @@ export const PositionDetails = () => {
           sx={{
             fontWeight: 'bold',
             fontSize: '1rem',
+            marginTop: '1rem',
+            marginBottom: '1rem',
           }}
         />
       </Grid>
