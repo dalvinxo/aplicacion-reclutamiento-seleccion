@@ -61,7 +61,15 @@ const formPuestoSchema = yup.object().shape({
   nivel_maximo_salario: yup
     .number()
     .positive('El salario máximo debe ser mayor a 0.')
-    .required('El salario máximo es requerido.'),
+    .required('El salario máximo es requerido.')
+    .test(
+      'max-greater-than-min',
+      'El salario máximo debe ser mayor o igual al salario mínimo.',
+      function (value) {
+        const { nivel_minimo_salario } = this.parent;
+        return value >= nivel_minimo_salario;
+      }
+    ),
   competencias: yup
     .array()
     .of(yup.number())
