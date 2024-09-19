@@ -7,11 +7,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     server: {
+      // Este proxy me permite evitar problemas con el CORS en desarrollo
       proxy: {
         '/api': {
           target: env.VITE_DOMAIN_API,
           changeOrigin: true,
-          // rewrite: (path) => path.replace(/^\/api/, ''),
         },
       },
     },
