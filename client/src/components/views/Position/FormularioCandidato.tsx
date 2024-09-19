@@ -341,6 +341,32 @@ export const FormularioCandidato = () => {
   };
 
   const onSubmit = (data: IFormularioCandidato) => {
+    let hasErrors = false;
+
+    data.capacitaciones.forEach((item, index) => {
+      if (new Date(item.fecha_hasta) < new Date(item.fecha_desde)) {
+        setError(`capacitaciones.${index}.fecha_hasta`, {
+          type: 'manual',
+          message: 'La fecha hasta debe ser posterior a la fecha desde.',
+        });
+        hasErrors = true;
+      }
+    });
+
+    data.experiencias_laborales.forEach((item, index) => {
+      if (new Date(item.fecha_hasta) < new Date(item.fecha_desde)) {
+        setError(`experiencias_laborales.${index}.fecha_hasta`, {
+          type: 'manual',
+          message: 'La fecha hasta debe ser posterior a la fecha desde.',
+        });
+        hasErrors = true;
+      }
+    });
+
+    if (hasErrors) {
+      return;
+    }
+
     if (data.persona_id) {
       updateCandidato(data);
       return;
