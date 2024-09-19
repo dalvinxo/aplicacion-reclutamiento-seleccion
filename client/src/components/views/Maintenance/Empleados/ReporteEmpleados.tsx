@@ -64,11 +64,17 @@ export const ReporteEmpleados = ({
 
       <Text style={styles.header_secondary}>
         Rango de fechas:{'\n\n'}
-        {!!desde && !!hasta
+        {!!desde && moment(desde).isValid() && hasta && moment(hasta).isValid()
           ? `desde: ${moment(desde).format('DD / MM / YYYY')}\nhasta: ${moment(hasta).format('DD / MM / YYYY')}`
-          : !!desde && !hasta
-            ? `desde: ${moment(desde).format('DD / MM / YYYY')}\nhasta: ${moment('').format('DD / MM / YYYY')}`
-            : `desde: ${moment('').format('DD / MM / YYYY')}\nhasta: ${moment(hasta).format('DD / MM / YYYY')}`}
+          : !!desde &&
+              moment(desde).isValid() &&
+              (!hasta || !moment(hasta).isValid())
+            ? `desde: ${moment(desde).format('DD / MM / YYYY')}`
+            : !!hasta &&
+                moment(hasta).isValid() &&
+                (!desde || !moment(desde).isValid())
+              ? `hasta: ${moment(hasta).format('DD / MM / YYYY')}`
+              : ''}
       </Text>
 
       <View style={styles.tableContainer}>

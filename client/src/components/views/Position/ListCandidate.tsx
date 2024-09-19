@@ -287,7 +287,7 @@ export const ListCandidate = () => {
                                           marginLeft: '1rem',
                                         }}
                                       >
-                                        <GavelIcon /> Reclutar
+                                        <GavelIcon />
                                       </IconButton>
                                     </TableCell>
                                   );

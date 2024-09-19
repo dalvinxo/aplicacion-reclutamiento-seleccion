@@ -51,10 +51,6 @@ export const Profile = () => {
                       <strong>Nombre:</strong> {data.persona.nombre}
                     </Typography>
                     <Typography variant="body1">
-                      <strong>Puesto Aspirado:</strong>{' '}
-                      {data.puesto_aspirado_id}
-                    </Typography>
-                    <Typography variant="body1">
                       <strong>Salario Aspirado:</strong> $
                       {data.salario_aspirado}
                     </Typography>

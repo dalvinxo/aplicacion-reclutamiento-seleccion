@@ -5,10 +5,15 @@ import { Empleado } from '../../../features/empleados/empleadosTypes';
 import { SkeletonLoading } from '../../commons/SkeletonLoading';
 
 export const Charts = () => {
-  const { data, isLoading } = useGetAllEmpleadosFilterQuery({
-    pages: 1,
-    limit: 1000,
-  });
+  const { data, isLoading } = useGetAllEmpleadosFilterQuery(
+    {
+      pages: 1,
+      limit: 1000,
+    },
+    {
+      refetchOnReconnect: true,
+    }
+  );
 
   if (isLoading) return <SkeletonLoading />;
 
